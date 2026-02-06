@@ -1,220 +1,177 @@
-# Eco Cusco  
-Backend RESTful para la gestión de reportes ciudadanos sobre limpieza pública y mantenimiento urbano en la ciudad de Cusco.  
-Construido con **Spring Boot**, enfocado en seguridad, modularidad, escalabilidad y despliegue fácil en entornos productivos.
+# Eco Cusco API
+
+<div align="center">
+
+![Java](https://img.shields.io/badge/Java-17+-orange?style=for-the-badge&logo=java)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.6-brightgreen?style=for-the-badge&logo=spring)
+![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
+
+**API RESTful para la gestión de reportes ciudadanos sobre limpieza pública y mantenimiento urbano en Cusco**
+
+[Características](#-características) •
+[Instalación](#-instalación-rápida) •
+[Documentación](#-documentación) •
+[API](#-api-endpoints) •
+[Contribuir](#-contribuir)
+
+</div>
 
 ---
 
-## 📌 Resumen  
-**Eco Cusco** permite centralizar reportes geolocalizados enviados por ciudadanos, facilitando su registro, administración y seguimiento mediante una API moderna y segura.  
-El sistema está diseñado con arquitectura limpia, desacoplada y siguiendo buenas prácticas del ecosistema Spring.
+## Descripción
 
-**Incluye:**  
-- Gestión de usuarios.  
-- Generación y validación de tokens JWT.  
-- CRUD de reportes geolocalizados.  
-- Estados configurables.  
-- Filtros y búsquedas flexibles.  
-- Perfiles y configuraciones para distintos entornos.
+**Eco Cusco** es una API backend moderna construida con Spring Boot que permite a los ciudadanos reportar problemas de limpieza y mantenimiento urbano en la ciudad de Cusco. La plataforma facilita la gestión, seguimiento y resolución de reportes georeferenciados mediante una arquitectura limpia, segura y escalable.
+
+### Objetivo
+
+Crear un puente de comunicación eficiente entre ciudadanos y autoridades municipales para mejorar la limpieza y el mantenimiento urbano en Cusco.
 
 ---
 
-## 📚 Tabla de Contenidos  
-1. [Características](#características)  
-2. [Arquitectura & Estructura del Proyecto](#arquitectura--estructura-del-proyecto)  
-3. [Tecnologías](#tecnologías)  
-4. [Requisitos](#requisitos)  
-5. [Instalación y Ejecución](#instalación-y-ejecución)  
-6. [Configuración](#configuración)  
-7. [API & Documentación](#api--documentación)  
-8. [Pruebas](#pruebas)  
-9. [Buenas Prácticas Implementadas](#buenas-prácticas-implementadas)  
-10. [Roadmap](#roadmap)  
-11. [Contribuir](#contribuir)  
-12. [Licencia](#licencia)  
-13. [Autor](#autor)
+## Características
+
+### Core Features
+- **Autenticación JWT**: Sistema seguro de autenticación basado en tokens
+- **Gestión de Usuarios**: Registro, login y administración de usuarios con roles
+- **Reportes Georeferenciados**: Creación y gestión de reportes con ubicación exacta
+- **Estados Configurables**: Flujo de trabajo definido (PENDIENTE → EN_PROCESO → RESUELTO)
+- **Filtros Avanzados**: Búsqueda por usuario, estado, distrito y más
+- **Soporte Multi-media**: URLs de fotos asociadas a reportes
+- **Historial de Estados**: Tracking completo de cambios de estado con notas
+
+### Technical Features
+- **Arquitectura en Capas**: Separación clara de responsabilidades
+- **Seguridad Spring Security**: Protección de endpoints y autorización
+- **Validaciones Robustas**: Bean Validation con mensajes personalizados
+- **CORS Configurado**: Listo para integración con frontends
+- **OpenAPI/Swagger**: Documentación automática e interactiva
+- **Multi-database**: H2 para desarrollo, PostgreSQL para producción
+- **Perfiles de Configuración**: Ambientes separados (dev/prod)
 
 ---
 
-## 🧩 Características  
-- **Gestión de usuarios:** registro, autenticación y control de acceso.  
-- **Reportes ciudadanos:** creación de reportes con:
-  - ubicación (latitud/longitud)  
-  - descripción  
-  - fecha de creación  
-  - adjuntos opcionales  
-- **Flujo de estados:**  
-  - `PENDIENTE` → `EN_PROCESO` → `RESUELTO`  
-- **Filtros avanzados:**  
-  - por usuario  
-  - por estado  
-  - por rango geográfico  
-  - por fechas (si se implementa)  
-- **Seguridad con JWT:** filtros, provider, user details y configuración dedicada.  
-- **Arquitectura limpia y escalable:** capas separadas para mantenimiento profesional.  
-- **Documentación automática con OpenAPI/Swagger** (si está habilitado).
+## Arquitectura
+
+### Estructura del Proyecto
+
+```
+src/main/java/com/cusco/limpio/
+├── config/                 # Configuraciones (Security, CORS, OpenAPI)
+├── controller/             # Endpoints REST
+├── domain/                 # Modelos de dominio y enums
+│   ├── enums/             # Estados de reportes
+│   ├── events/            # Eventos del dominio
+│   └── model/             # Entidades JPA
+├── dto/                   # Data Transfer Objects
+│   ├── report/            # DTOs de reportes
+│   └── user/              # DTOs de usuarios
+├── exception/             # Excepciones personalizadas y manejador global
+├── mapper/                # Mappers Entity ↔ DTO
+├── repository/            # Repositorios JPA
+├── security/              # JWT, filtros, UserDetails
+├── service/               # Interfaces de servicio
+│   └── impl/              # Implementaciones de servicios
+└── util/                  # Utilidades (fechas, geo, responses)
+
+src/test/java/com/cusco/limpio/
+├── controller/            # Tests de controladores
+├── service/               # Tests de servicios
+│   └── impl/              # Tests de implementaciones
+└── CuscoLimpioApiApplicationTests.java
+```
+
+### Capas de la Aplicación
+
+```mermaid
+graph TB
+    A[Controller Layer] -->|DTOs| B[Service Layer]
+    B -->|Entities| C[Repository Layer]
+    C -->|JPA| D[(Database)]
+    E[Security Filter] -->|JWT| A
+    F[Exception Handler] -.->|Errors| A
+```
 
 ---
 
-## 🏗 Arquitectura & Estructura del Proyecto
+## Tecnologías
 
-**Paquete raíz:** `com.cusco.limpio`
-
-Directorio principal:
-src/main/java/com/cusco/limpio
-├── controller # Endpoints REST
-├── service # Interfaces de servicio
-│ └── impl # Implementaciones de la lógica de negocio
-├── repository # Interfaces JPA (DAO)
-├── entity # Entidades JPA del dominio
-├── dto # DTOs de entrada/salida
-├── mapper # Mappers entre Entity ↔ DTO
-├── security # JWT, filtros, config, user details
-└── exception # Manejo global de errores
-
-makefile
-Copiar código
-
-Recursos:
-src/main/resources
-├── application.properties
-├── application-dev.properties
-└── application-prod.properties
-
-yaml
-Copiar código
+| Tecnología | Versión | Propósito |
+|-----------|---------|-----------|
+| **Java** | 17+ | Lenguaje de programación |
+| **Spring Boot** | 3.3.6 | Framework principal |
+| **Spring Security** | 3.3.6 | Autenticación y autorización |
+| **Spring Data JPA** | 3.3.6 | Persistencia de datos |
+| **JWT (jjwt)** | 0.12.5 | Tokens de autenticación |
+| **Lombok** | Latest | Reducción de boilerplate |
+| **PostgreSQL** | Latest | Base de datos producción |
+| **H2** | Latest | Base de datos desarrollo |
+| **SpringDoc OpenAPI** | 2.1.0 | Documentación API |
+| **Maven** | 3.6+ | Gestión de dependencias |
 
 ---
 
-## ⚙️ Tecnologías  
-- **Java 17+**  
-- **Spring Boot 3+**  
-- **Spring Web**  
-- **Spring Security (JWT)**  
-- **Spring Data JPA**  
-- **Maven**  
-- **H2** para desarrollo  
-- **PostgreSQL/MySQL** para producción  
-- **Swagger/OpenAPI** (configurable)
+## Instalación Rápida
+
+### Prerequisitos
+
+- **Java 17+** - [Descargar](https://adoptium.net/)
+- **Maven 3.6+** - [Descargar](https://maven.apache.org/download.cgi)
+- **PostgreSQL** (solo para producción) - [Descargar](https://www.postgresql.org/download/)
+
+### Pasos de Instalación
+
+1. **Clonar el repositorio**
+   ```bash
+   git clone https://github.com/EzerZuniga/eco-cusco.git
+   cd eco-cusco
+   ```
+
+2. **Compilar el proyecto**
+   ```bash
+   # Con Maven
+   mvn clean install
+   
+   # Con el script incluido (Windows)
+   build.bat
+   
+   # Para compilar sin ejecutar tests
+   build.bat skip-tests
+   ```
+
+3. **Ejecutar en modo desarrollo**
+   ```bash
+   # Con Maven
+   mvn spring-boot:run -Dspring-boot.run.profiles=dev
+   
+   # Con el script incluido (Windows)
+   run.bat
+   
+   # Para usar otro perfil
+   run.bat prod
+   ```
+
+4. **Ejecutar tests**
+   ```bash
+   # Con Maven
+   mvn test
+   
+   # Con el script incluido (Windows)
+   test.bat
+   ```
+
+5. **Acceder a la aplicación**
+   - API: http://localhost:8080
+   - Swagger UI: http://localhost:8080/swagger-ui.html
+   - H2 Console: http://localhost:8080/h2-console
 
 ---
-
-## 🧰 Requisitos  
-- **JDK 17+**  
-- **Maven 3.6+**  
-- **PostgreSQL/MySQL** (solo para entornos productivos)  
-- **Git** para clonar el repositorio  
-
 ---
 
-## 🚀 Instalación y Ejecución
+## Seguridad
 
-### 1. Clonar repositorio
-```bash
-git clone https://github.com/EzerZuniga/eco-cusco.git
-cd eco-cusco
-2. Ejecutar en modo desarrollo
-bash
-Copiar código
-mvn clean package
-mvn spring-boot:run -Dspring-boot.run.profiles=dev
-3. Ejecutar JAR empaquetado
-bash
-Copiar código
-mvn clean package
-java -jar -Dspring.profiles.active=dev target/*.jar
-🔧 Configuración
-Archivos ubicados en src/main/resources/:
+### Autenticación JWT
 
-matlab
-Copiar código
-application.properties
-application-dev.properties
-application-prod.properties
-Variables críticas para producción:
-pgsql
-Copiar código
-jwt.secret=TU_SECRETO_AQUI
-spring.datasource.url=
-spring.datasource.username=
-spring.datasource.password=
-También considerar:
-
-Configuración de CORS
-
-Puertos personalizados
-
-Configuración del pool de conexiones
-
-🔗 API & Documentación
-Endpoints principales
-Método	Endpoint	Descripción
-GET	/api/health	Verifica que el servicio esté activo
-POST	/api/users	Registro de usuario
-POST	/api/auth/login	Autenticación (retorna JWT)
-POST	/api/reports	Crear reporte ciudadano
-GET	/api/reports	Listar reportes con filtros
-
-Swagger UI
-Si está habilitado:
-
-bash
-Copiar código
-/swagger-ui.html
-o
-
-bash
-Copiar código
-/swagger-ui/index.html
-🧪 Pruebas
-Ejecutar pruebas unitarias e integradas:
-
-bash
-Copiar código
-mvn test
-🧠 Buenas Prácticas Implementadas
-Arquitectura por capas bien definida.
-
-DTOs para desacoplar la capa de entidad.
-
-Manejo centralizado de excepciones.
-
-Validaciones con anotaciones estándar (@NotNull, @Size, etc.).
-
-Seguridad con JWT y filtros personalizados.
-
-Perfiles para desarrollo y producción.
-
-Estándares de nombres coherentes y limpios.
-
-🗺 Roadmap
- Implementar adjuntos para reportes (almacenamiento local/S3).
-
- Rango geográfico avanzado usando Haversine.
-
- Roles y permisos extendidos (ADMIN, USER).
-
- Integración con notificaciones push o móvil.
-
- Dashboard web para administradores.
-
- Despliegue en Docker + CI/CD.
-
-🤝 Contribuir
-Hacer fork del repositorio.
-
-Crear una rama de trabajo:
-
-bash
-Copiar código
-git checkout -b feat/nueva-funcionalidad
-Asegurar que todas las pruebas pasen.
-
-Enviar Pull Request hacia main.
-
-📄 Licencia
-Este proyecto se distribuye bajo la licencia incluida en el archivo LICENSE.
-
-👤 Autor
-Ezer Zúñiga
-Cusco – Perú
-Repositorio oficial:
+1. Login con credenciales válidas
+2. Recibir token JWT en la respuesta
+3. Incluir token en header: `Authorization: Bearer {token}`
+4. Token válido por 24 horas (configurable)

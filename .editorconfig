@@ -1,0 +1,49 @@
+# EditorConfig: https://EditorConfig.org
+
+# Configuración principal
+root = true
+
+# Configuración para todos los archivos
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+max_line_length = 120
+
+# Archivos Java
+[*.java]
+indent_size = 4
+
+# Archivos YAML
+[*.{yml,yaml}]
+indent_size = 2
+
+# Archivos de propiedades
+[*.properties]
+indent_size = 2
+
+# Archivos XML
+[*.xml]
+indent_size = 4
+
+# Archivos JSON
+[*.json]
+indent_size = 2
+
+# Archivos Markdown
+[*.md]
+trim_trailing_whitespace = false
+max_line_length = off
+
+# Archivos bash/shell
+[*.{sh,bash}]
+end_of_line = lf
+indent_size = 2
+
+# Archivos batch de Windows
+[*.{bat,cmd}]
+end_of_line = crlf
+indent_size = 2

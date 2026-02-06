@@ -1,5 +1,6 @@
 package com.cusco.limpio.service;
 
+import com.cusco.limpio.dto.user.AuthResponseDTO;
 import com.cusco.limpio.dto.user.CreateUserDTO;
 import com.cusco.limpio.dto.user.LoginDTO;
 import com.cusco.limpio.dto.user.UserDTO;
@@ -12,5 +13,5 @@ public interface UserService {
 	List<UserDTO> getAllUsers();
 	UserDTO updateUser(Long id, CreateUserDTO updateUserDTO);
 	void deleteUser(Long id);
-	UserDTO authenticate(LoginDTO loginDTO);
+	AuthResponseDTO authenticate(LoginDTO loginDTO);
 }

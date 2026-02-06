@@ -11,7 +11,7 @@ import com.cusco.limpio.repository.LocationRepository;
 import com.cusco.limpio.repository.ReportRepository;
 import com.cusco.limpio.repository.UserRepository;
 import com.cusco.limpio.service.ReportService;
-import com.cusco.limpio.service.mapper.ReportMapper;
+import com.cusco.limpio.mapper.ReportMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

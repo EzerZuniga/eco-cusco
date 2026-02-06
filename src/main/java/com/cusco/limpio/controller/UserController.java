@@ -1,5 +1,6 @@
 package com.cusco.limpio.controller;
 
+import com.cusco.limpio.dto.user.AuthResponseDTO;
 import com.cusco.limpio.dto.user.CreateUserDTO;
 import com.cusco.limpio.dto.user.LoginDTO;
 import com.cusco.limpio.dto.user.UserDTO;
@@ -35,8 +36,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<UserDTO> login(@Validated @RequestBody LoginDTO loginDTO) {
-        UserDTO user = userService.authenticate(loginDTO);
-        return ResponseEntity.ok(user);
+    public ResponseEntity<AuthResponseDTO> login(@Validated @RequestBody LoginDTO loginDTO) {
+        AuthResponseDTO response = userService.authenticate(loginDTO);
+        return ResponseEntity.ok(response);
     }
 }

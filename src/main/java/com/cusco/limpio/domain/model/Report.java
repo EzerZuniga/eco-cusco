@@ -34,6 +34,7 @@ public class Report {
     private String category;
     
     @ElementCollection
+    @Builder.Default
     private List<String> photoUrls = new ArrayList<>();
     
     @ManyToOne(fetch = FetchType.LAZY)
@@ -50,6 +51,7 @@ public class Report {
     private LocalDateTime updatedAt;
     
     @ElementCollection
+    @Builder.Default
     private List<StatusHistory> statusHistory = new ArrayList<>();
     
     @Embeddable

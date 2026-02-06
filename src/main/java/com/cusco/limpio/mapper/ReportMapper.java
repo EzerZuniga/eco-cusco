@@ -1,11 +1,9 @@
-package com.cusco.limpio.service.mapper;
+package com.cusco.limpio.mapper;
 
 import com.cusco.limpio.domain.model.Report;
 import com.cusco.limpio.dto.report.ReportDTO;
 import com.cusco.limpio.dto.user.UserDTO;
 import org.springframework.stereotype.Component;
-
-import java.util.stream.Collectors;
 
 @Component
 public class ReportMapper {
@@ -26,10 +24,10 @@ public class ReportMapper {
                 report.getLocation() == null ? null : report.getLocation().getDistrict()
         );
 
-        var statusHistory = report.getStatusHistory() == null ? java.util.List.of() :
+        var statusHistory = report.getStatusHistory() == null ? java.util.List.<ReportDTO.StatusHistoryDTO>of() :
                 report.getStatusHistory().stream()
                         .map(h -> new ReportDTO.StatusHistoryDTO(h.getStatus(), h.getTimestamp(), h.getNotes()))
-                        .collect(Collectors.toList());
+                        .toList();
 
         UserDTO userDTO = report.getUser() == null ? null : userMapper.toDTO(report.getUser());
 

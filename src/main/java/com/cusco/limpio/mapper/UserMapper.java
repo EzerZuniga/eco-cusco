@@ -1,4 +1,4 @@
-package com.cusco.limpio.service.mapper;
+package com.cusco.limpio.mapper;
 
 import com.cusco.limpio.domain.model.User;
 import com.cusco.limpio.dto.user.CreateUserDTO;
