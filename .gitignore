@@ -86,3 +86,48 @@ application-secret.properties
 
 # Spring Boot
 spring-boot-*.log
+
+# Logs generales
+logs/
+*.log.*
+
+# Base de datos local
+*.db
+*.sqlite
+*.h2.db
+h2-data/
+
+# Archivo de backups
+*.bak
+*.backup
+*.swp
+*.swo
+*~
+
+# Archivos temporales de testing
+test-output/
+coverage/
+.nyc_output/
+
+# Node (si usas frontend integrado)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Python (si integras scripts)
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.Python
+
+# PostgreSQL dumps
+*.sql.backup
+*.dump
+
+# IDE específico del usuario
+.vscode/
+.idea/workspace.xml
+.idea/tasks.xml

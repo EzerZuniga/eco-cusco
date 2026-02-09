@@ -1,9 +1,6 @@
 package com.cusco.limpio.dto.user;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
-
-import java.time.LocalDateTime;
 
 /**
  * DTO de respuesta para autenticación

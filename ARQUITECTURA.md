@@ -4,7 +4,7 @@
 
 Eco Cusco API sigue una **arquitectura en capas limpia** (Clean Architecture) con separación clara de responsabilidades.
 
----
+--- 
 
 ## 🏗️ Estructura de Capas
 
@@ -144,16 +144,11 @@ eco-cusco/
 │
 ├── 📄 .editorconfig                      [Configuración de editor]
 ├── 📄 .gitignore                         [Git ignore]
-├── 📄 build.bat                          [Script compilación]
-├── 📄 clean.bat                          [Script limpieza]
 ├── 📄 CONTRIBUTING.md                    [Guía contribución]
 ├── 📄 LICENSE                            [Licencia MIT]
-├── 📄 MEJORAS_REALIZADAS.md             [Resumen mejoras]
 ├── 📄 mvnw.cmd                          [Maven wrapper]
 ├── 📄 pom.xml                           [Configuración Maven]
-├── 📄 README.md                         [Documentación]
-├── 📄 run.bat                           [Script ejecución]
-└── 📄 test.bat                          [Script tests]
+└── 📄 README.md                         [Documentación]
 ```
 
 ---

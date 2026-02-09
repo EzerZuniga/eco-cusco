@@ -107,15 +107,8 @@ cd "%EXEC_DIR%"
 
 :endDetectBaseDir
 
-IF NOT EXIST "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadAdditionalConfig
+IF NOT EXIST "%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-wrapper.jar" goto downloadWrapper
 
-@setlocal EnableExtensions EnableDelayedExpansion
-for /F "usebackq delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config") do set JVM_CONFIG_MAVEN_PROPS=!JVM_CONFIG_MAVEN_PROPS! %%a
-@endlocal & set JVM_CONFIG_MAVEN_PROPS=%JVM_CONFIG_MAVEN_PROPS%
-
-:endReadAdditionalConfig
-
-SET MAVEN_JAVA_EXE="%JAVA_HOME%\bin\java.exe"
 set WRAPPER_JAR="%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-wrapper.jar"
 set WRAPPER_LAUNCHER=org.apache.maven.wrapper.MavenWrapperMain
 
@@ -171,11 +164,29 @@ IF NOT %WRAPPER_SHA_256_SUM%=="" (
     if ERRORLEVEL 1 goto error
 )
 
-@REM Provide a "standardized" way to retrieve the CLI args that will
-@REM work with both Windows and non-Windows executions.
-set MAVEN_CMD_LINE_ARGS=%*
+:downloadWrapper
+@REM if the wrapper is not downloadable yet (without maven-wrapper.jar).
+if "%MVNW_SKIP_DOWNLOAD%" == "true" (
+    if "%MVNW_VERBOSE%" == "true" (
+        echo Skip download by MVNW_SKIP_DOWNLOAD flag
+    )
+    goto runMaven
+)
 
-%MAVEN_JAVA_EXE% ^
+@REM Fallback to maven-wrapper.jar if maven-wrapper.properties is missing.
+IF NOT EXIST "%MAVEN_PROJECTBASEDIR%\.mvn\wrapper\maven-wrapper.properties" (
+    if "%MVNW_VERBOSE%" == "true" (
+        echo maven-wrapper.properties not found, fallback to wrapper downloads
+    )
+    goto downloadWrapper
+)
+
+:runMaven
+@REM Setup the command line
+
+set CLASSWORLDS_LAUNCHER=org.codehaus.plexus.classworlds.launcher.Launcher
+
+"%JAVA_HOME%\bin\java.exe" ^
   %JVM_CONFIG_MAVEN_PROPS% ^
   %MAVEN_OPTS% ^
   %MAVEN_DEBUG_OPTS% ^

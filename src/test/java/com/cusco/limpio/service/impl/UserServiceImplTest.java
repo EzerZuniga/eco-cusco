@@ -63,7 +63,7 @@ class UserServiceImplTest {
                 .firstName("John")
                 .lastName("Doe")
                 .phone("999999999")
-                .role(User.UserRole.USER)
+                .role(User.UserRole.CITIZEN)
                 .active(true)
                 .createdAt(LocalDateTime.now())
                 .build();
