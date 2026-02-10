@@ -9,13 +9,15 @@ import java.util.Map;
 
 public final class ResponseUtils {
 
-	private ResponseUtils() {}
+	private ResponseUtils() {
+	}
 
 	private static Map<String, Object> baseBody(int status, String message) {
 		Map<String, Object> body = new LinkedHashMap<>();
 		body.put("timestamp", Instant.now().toString());
 		body.put("status", status);
-		if (message != null) body.put("message", message);
+		if (message != null)
+			body.put("message", message);
 		return body;
 	}
 
@@ -49,4 +51,3 @@ public final class ResponseUtils {
 		return error(HttpStatus.UNAUTHORIZED, message);
 	}
 }
-

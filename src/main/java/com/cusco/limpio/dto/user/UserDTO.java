@@ -7,13 +7,12 @@ import java.time.LocalDateTime;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public record UserDTO(
-    Long id,
-    String email,
-    String firstName,
-    String lastName,
-    String phone,
-    String role,
-    Boolean active,
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    LocalDateTime createdAt
-) {}
+        Long id,
+        String email,
+        String firstName,
+        String lastName,
+        String phone,
+        String role,
+        Boolean active,
+        @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss") LocalDateTime createdAt) {
+}

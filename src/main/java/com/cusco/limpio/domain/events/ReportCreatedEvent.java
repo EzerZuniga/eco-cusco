@@ -8,8 +8,7 @@ public record ReportCreatedEvent(
 		String title,
 		String category,
 		String district,
-		Instant createdAt
-) {
+		Instant createdAt) {
 
 	public ReportCreatedEvent {
 		if (createdAt == null) {

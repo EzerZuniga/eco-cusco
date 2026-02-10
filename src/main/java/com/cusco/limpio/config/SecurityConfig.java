@@ -1,7 +1,7 @@
 package com.cusco.limpio.config;
 
-import com.cusco.limpio.security.JwtAuthFilter;
-import com.cusco.limpio.security.JwtTokenProvider;
+import java.util.Arrays;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -18,7 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.util.Arrays;
+import com.cusco.limpio.security.JwtAuthFilter;
+import com.cusco.limpio.security.JwtTokenProvider;
 
 @Configuration
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
@@ -41,7 +42,8 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtTokenProvider tokenProvider, UserDetailsService userDetailsService) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtTokenProvider tokenProvider,
+            UserDetailsService userDetailsService) throws Exception {
         JwtAuthFilter jwtFilter = new JwtAuthFilter(tokenProvider, userDetailsService);
 
         http
@@ -54,8 +56,7 @@ public class SecurityConfig {
                             "/api/users/login",
                             "/swagger-ui/**",
                             "/v3/api-docs/**",
-                            "/swagger-ui.html"
-                    ).permitAll();
+                            "/swagger-ui.html").permitAll();
 
                     if (isDevelopmentProfile()) {
                         auth.requestMatchers("/h2-console/**").permitAll();
@@ -66,9 +67,7 @@ public class SecurityConfig {
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         if (isDevelopmentProfile()) {
-            http.headers(headers -> 
-                headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
-            );
+            http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
         }
 
         return http.build();

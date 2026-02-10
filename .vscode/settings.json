@@ -7,7 +7,7 @@
   "editor.rulers": [120],
   "editor.tabSize": 4,
   "editor.insertSpaces": false,
-  
+
   // Files
   "files.encoding": "utf8",
   "files.eol": "\n",
@@ -19,7 +19,7 @@
     "**/target": true,
     "**/*.class": true
   },
-  
+
   // Java
   "java.configuration.updateBuildConfiguration": "automatic",
   "java.compile.nullAnalysis.mode": "automatic",
@@ -27,16 +27,16 @@
   "java.format.settings.url": "${workspaceFolder}/.vscode/java-formatter.xml",
   "java.codeGeneration.hashCodeEquals.useJava7Objects": true,
   "java.codeGeneration.useBlocks": true,
-  
+
   // Spring Boot
   "spring-boot.ls.java.home": "${env:JAVA_HOME}",
   "spring-boot.ls.problem.application-properties.PROP_UNKNOWN_PROPERTY": "WARNING",
   "spring-boot.ls.problem.application-yaml.YAML_UNKNOWN_PROPERTY": "WARNING",
-  
+
   // Maven
   "maven.terminal.useJavaHome": true,
   "maven.executable.path": "${workspaceFolder}/mvnw.cmd",
-  
+
   // Testing
   "java.test.config": {
     "workingDirectory": "${workspaceFolder}",
@@ -44,19 +44,19 @@
       "SPRING_PROFILES_ACTIVE": "test"
     }
   },
-  
+
   // Git
   "git.enableSmartCommit": true,
   "git.confirmSync": false,
   "git.autofetch": true,
-  
+
   // Search
   "search.exclude": {
     "**/target": true,
     "**/node_modules": true,
     "**/*.log": true
   },
-  
+
   // Terminal
   "terminal.integrated.defaultProfile.windows": "PowerShell",
   "terminal.integrated.env.windows": {
