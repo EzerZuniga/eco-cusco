@@ -59,7 +59,7 @@ jobs:
       run: ./mvnw package -DskipTests
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v6
       with:
         name: cusco-limpio-api
         path: target/*.jar
