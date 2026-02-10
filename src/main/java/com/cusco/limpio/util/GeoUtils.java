@@ -1,25 +1,11 @@
 package com.cusco.limpio.util;
 
-/**
- * Utilidades geográficas pequeñas.
- */
 public final class GeoUtils {
 
 	private static final double EARTH_RADIUS_METERS = 6_371_000d;
 
-	private GeoUtils() {
-		// util
-	}
+	private GeoUtils() {}
 
-	/**
-	 * Calcula la distancia (en metros) entre dos puntos geográficos usando la fórmula Haversine.
-	 *
-	 * @param lat1 latitud punto A en grados
-	 * @param lon1 longitud punto A en grados
-	 * @param lat2 latitud punto B en grados
-	 * @param lon2 longitud punto B en grados
-	 * @return distancia en metros
-	 */
 	public static double haversineDistanceMeters(double lat1, double lon1, double lat2, double lon2) {
 		double dLat = Math.toRadians(lat2 - lat1);
 		double dLon = Math.toRadians(lon2 - lon1);
@@ -33,9 +19,6 @@ public final class GeoUtils {
 		return EARTH_RADIUS_METERS * c;
 	}
 
-	/**
-	 * Comprueba si las coordenadas son válidas.
-	 */
 	public static boolean isValidLatitude(double lat) {
 		return !Double.isNaN(lat) && lat >= -90.0 && lat <= 90.0;
 	}
@@ -44,9 +27,6 @@ public final class GeoUtils {
 		return !Double.isNaN(lon) && lon >= -180.0 && lon <= 180.0;
 	}
 
-	/**
-	 * Devuelve true si la distancia entre los puntos es menor o igual a {@code meters}.
-	 */
 	public static boolean withinMeters(double lat1, double lon1, double lat2, double lon2, double meters) {
 		return haversineDistanceMeters(lat1, lon1, lat2, lon2) <= meters;
 	}

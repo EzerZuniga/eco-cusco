@@ -1,0 +1,50 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot App",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.cusco.limpio.CuscoLimpioApiApplication",
+      "projectName": "cusco-limpio-api",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env",
+      "vmArgs": "-Dspring.profiles.active=dev",
+      "console": "internalConsole",
+      "internalConsoleOptions": "openOnSessionStart"
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot (PostgreSQL)",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.cusco.limpio.CuscoLimpioApiApplication",
+      "projectName": "cusco-limpio-api",
+      "args": "",
+      "env": {
+        "SPRING_PROFILES_ACTIVE": "postgres",
+        "SPRING_DATASOURCE_PASSWORD": "zuniga2026"
+      },
+      "console": "internalConsole"
+    },
+    {
+      "type": "java",
+      "name": "Spring Boot Tests",
+      "request": "launch",
+      "cwd": "${workspaceFolder}",
+      "mainClass": "com.cusco.limpio.CuscoLimpioApiApplicationTests",
+      "projectName": "cusco-limpio-api",
+      "vmArgs": "-Dspring.profiles.active=test",
+      "console": "internalConsole"
+    },
+    {
+      "type": "java",
+      "name": "Debug Single Test",
+      "request": "launch",
+      "mainClass": "",
+      "projectName": "cusco-limpio-api",
+      "vmArgs": "-Dspring.profiles.active=test"
+    }
+  ]
+}

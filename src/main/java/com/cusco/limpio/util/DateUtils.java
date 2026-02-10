@@ -5,16 +5,11 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Objects;
 
-/**
- * Utilidades sencillas para manejo y formato de fechas/hora en la aplicación.
- */
 public final class DateUtils {
 
 	private static final DateTimeFormatter ISO = DateTimeFormatter.ISO_DATE_TIME;
 
-	private DateUtils() {
-		// util class
-	}
+	private DateUtils() {}
 
 	public static String toIso(LocalDateTime dateTime) {
 		if (dateTime == null) return null;

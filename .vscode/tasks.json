@@ -1,0 +1,133 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Maven: Clean",
+      "type": "shell",
+      "command": "./mvnw.cmd",
+      "args": ["clean"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Maven: Compile",
+      "type": "shell",
+      "command": "./mvnw.cmd",
+      "args": ["compile", "-DskipTests"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": ["$java"]
+    },
+    {
+      "label": "Maven: Test",
+      "type": "shell",
+      "command": "./mvnw.cmd",
+      "args": ["test"],
+      "group": {
+        "kind": "test",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": ["$java"]
+    },
+    {
+      "label": "Maven: Package",
+      "type": "shell",
+      "command": "./mvnw.cmd",
+      "args": ["package", "-DskipTests"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": ["$java"]
+    },
+    {
+      "label": "Spring Boot: Run (Dev)",
+      "type": "shell",
+      "command": "./mvnw.cmd",
+      "args": ["spring-boot:run", "-Dspring-boot.run.profiles=dev"],
+      "group": "none",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": {
+        "pattern": {
+          "regexp": ".",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*Tomcat.*",
+          "endsPattern": "^.*Started.*in.*seconds.*"
+        }
+      }
+    },
+    {
+      "label": "Spring Boot: Run (PostgreSQL)",
+      "type": "shell",
+      "command": "./mvnw.cmd",
+      "args": ["spring-boot:run", "-Dspring-boot.run.profiles=postgres"],
+      "group": "none",
+      "isBackground": true,
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": {
+        "pattern": {
+          "regexp": ".",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*Tomcat.*",
+          "endsPattern": "^.*Started.*in.*seconds.*"
+        }
+      }
+    },
+    {
+      "label": "Maven: Clean Install",
+      "type": "shell",
+      "command": "./mvnw.cmd",
+      "args": ["clean", "install", "-DskipTests"],
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": ["$java"]
+    },
+    {
+      "label": "Maven: Verify",
+      "type": "shell",
+      "command": "./mvnw.cmd",
+      "args": ["verify"],
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": ["$java"]
+    }
+  ]
+}

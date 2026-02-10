@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Documentación
+    url: https://github.com/EzerZuniga/eco-cusco/blob/main/README.md
+    about: Consulta la documentación del proyecto
+  - name: Discusiones
+    url: https://github.com/EzerZuniga/eco-cusco/discussions
+    about: Pregunta a la comunidad o inicia una discusión

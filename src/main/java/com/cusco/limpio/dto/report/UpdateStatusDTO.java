@@ -4,9 +4,6 @@ import com.cusco.limpio.domain.enums.ReportStatus;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
-/**
- * DTO para actualización de estado de reportes
- */
 public record UpdateStatusDTO(
     @NotNull(message = "El estado es obligatorio")
     ReportStatus status,

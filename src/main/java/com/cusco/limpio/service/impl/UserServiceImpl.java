@@ -108,7 +108,6 @@ public class UserServiceImpl implements UserService {
             throw new UnauthorizedException("User account is deactivated");
         }
 
-        // Generar token JWT
         String token = jwtTokenProvider.generateToken(user.getEmail());
         UserDTO userDTO = userMapper.toDTO(user);
 

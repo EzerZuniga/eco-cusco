@@ -4,9 +4,6 @@ import jakarta.validation.constraints.*;
 
 import java.util.List;
 
-/**
- * DTO para creación de reportes con validaciones completas
- */
 public record CreateReportDTO(
     @NotBlank(message = "El título es obligatorio")
     @Size(min = 5, max = 255, message = "El título debe tener entre 5 y 255 caracteres")

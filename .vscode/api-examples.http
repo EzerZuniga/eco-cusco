@@ -1,0 +1,172 @@
+### Eco Cusco API - REST Client Examples
+
+@baseUrl = http://localhost:8080
+@contentType = application/json
+
+### Variables
+@token = Bearer your-jwt-token-here
+@userId = 1
+@reportId = 1
+
+###############################################
+# Health Check
+###############################################
+
+### Health Check
+GET {{baseUrl}}/api/health
+Accept: application/json
+
+###############################################
+# Authentication & Users
+###############################################
+
+### Register New User
+POST {{baseUrl}}/api/users
+Content-Type: {{contentType}}
+
+{
+  "name": "Juan Pérez",
+  "email": "juan.perez@example.com",
+  "password": "SecurePass123!",
+  "phone": "+51987654321",
+  "dni": "12345678"
+}
+
+### Login
+POST {{baseUrl}}/api/users/login
+Content-Type: {{contentType}}
+
+{
+  "email": "juan.perez@example.com",
+  "password": "SecurePass123!"
+}
+
+### Get All Users (requires auth)
+GET {{baseUrl}}/api/users
+Authorization: {{token}}
+Accept: application/json
+
+### Get User by ID (requires auth)
+GET {{baseUrl}}/api/users/{{userId}}
+Authorization: {{token}}
+Accept: application/json
+
+### Update User (requires auth)
+PUT {{baseUrl}}/api/users/{{userId}}
+Authorization: {{token}}
+Content-Type: {{contentType}}
+
+{
+  "name": "Juan Pérez Actualizado",
+  "phone": "+51999888777"
+}
+
+### Delete User (requires auth)
+DELETE {{baseUrl}}/api/users/{{userId}}
+Authorization: {{token}}
+
+###############################################
+# Reports
+###############################################
+
+### Get All Reports (requires auth)
+GET {{baseUrl}}/api/reports
+Authorization: {{token}}
+Accept: application/json
+
+### Get Report by ID (requires auth)
+GET {{baseUrl}}/api/reports/{{reportId}}
+Authorization: {{token}}
+Accept: application/json
+
+### Create Report (requires auth)
+POST {{baseUrl}}/api/reports
+Authorization: {{token}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Basura acumulada en Av. Sol",
+  "description": "Acumulación de basura en la esquina",
+  "category": "Residuos Sólidos",
+  "latitude": -13.5226131,
+  "longitude": -71.9673550,
+  "address": "Av. El Sol 123",
+  "district": "Cusco",
+  "photoUrls": [
+    "https://example.com/photo1.jpg"
+  ]
+}
+
+### Update Report Status (requires auth - ADMIN)
+PATCH {{baseUrl}}/api/reports/{{reportId}}/status
+Authorization: {{token}}
+Content-Type: {{contentType}}
+
+{
+  "status": "IN_PROGRESS",
+  "notes": "Personal asignado para limpieza"
+}
+
+### Delete Report (requires auth)
+DELETE {{baseUrl}}/api/reports/{{reportId}}
+Authorization: {{token}}
+
+### Filter Reports by Status (requires auth)
+GET {{baseUrl}}/api/reports?status=PENDING
+Authorization: {{token}}
+Accept: application/json
+
+### Filter Reports by Category (requires auth)
+GET {{baseUrl}}/api/reports?category=Residuos Sólidos
+Authorization: {{token}}
+Accept: application/json
+
+### Search Reports Near Location (requires auth)
+GET {{baseUrl}}/api/reports?latitude=-13.5226131&longitude=-71.9673550&radiusMeters=5000
+Authorization: {{token}}
+Accept: application/json
+
+###############################################
+# Swagger UI
+###############################################
+
+### Open Swagger UI
+# @name swagger
+GET {{baseUrl}}/swagger-ui.html
+
+### Get OpenAPI JSON
+GET {{baseUrl}}/v3/api-docs
+Accept: application/json
+
+###############################################
+# Error Cases (for testing)
+###############################################
+
+### Invalid Login (401)
+POST {{baseUrl}}/api/users/login
+Content-Type: {{contentType}}
+
+{
+  "email": "wrong@example.com",
+  "password": "wrongpassword"
+}
+
+### Access Without Token (401)
+GET {{baseUrl}}/api/reports
+Accept: application/json
+
+### Invalid Report Data (400)
+POST {{baseUrl}}/api/reports
+Authorization: {{token}}
+Content-Type: {{contentType}}
+
+{
+  "title": "Mal",
+  "latitude": 200,
+  "longitude": -300
+}
+
+### Non-existent Resource (404)
+GET {{baseUrl}}/api/reports/99999
+Authorization: {{token}}
+Accept: application/json

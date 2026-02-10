@@ -20,10 +20,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.util.Arrays;
 
-/**
- * Configuración de seguridad de Spring Security
- * Implementa autenticación JWT stateless y autorización basada en roles
- */
 @Configuration
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
@@ -52,7 +48,6 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> {
-                    // Endpoints públicos
                     auth.requestMatchers(
                             "/api/health/**",
                             "/api/users",
@@ -62,17 +57,14 @@ public class SecurityConfig {
                             "/swagger-ui.html"
                     ).permitAll();
 
-                    // Permitir H2 console solo en perfil dev
                     if (isDevelopmentProfile()) {
                         auth.requestMatchers("/h2-console/**").permitAll();
                     }
 
-                    // Todos los demás endpoints requieren autenticación
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
-        // Desabilitar frame options solo en desarrollo (necesario para H2 console)
         if (isDevelopmentProfile()) {
             http.headers(headers -> 
                 headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
@@ -82,9 +74,6 @@ public class SecurityConfig {
         return http.build();
     }
 
-    /**
-     * Verifica si el perfil activo es desarrollo
-     */
     private boolean isDevelopmentProfile() {
         String[] activeProfiles = environment.getActiveProfiles();
         return Arrays.asList(activeProfiles).contains("dev");

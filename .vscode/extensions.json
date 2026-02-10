@@ -1,0 +1,33 @@
+{
+  "recommendations": [
+    // Java
+    "vscjava.vscode-java-pack",
+    "vscjava.vscode-spring-boot-dashboard",
+    "vmware.vscode-spring-boot",
+    "vscjava.vscode-maven",
+    
+    // Testing
+    "vscjava.vscode-java-test",
+    
+    // Code Quality
+    "sonarsource.sonarlint-vscode",
+    "streetsidesoftware.code-spell-checker",
+    
+    // Git
+    "eamodio.gitlens",
+    "mhutchie.git-graph",
+    
+    // REST API
+    "humao.rest-client",
+    "42crunch.vscode-openapi",
+    
+    // Database
+    "cweijan.vscode-postgresql-client2",
+    
+    // Utilities
+    "aaron-bond.better-comments",
+    "esbenp.prettier-vscode",
+    "redhat.vscode-yaml",
+    "ms-vscode.powershell"
+  ]
+}

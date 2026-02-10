@@ -5,9 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-/**
- * DTO para creación de usuarios con validaciones completas
- */
 public record CreateUserDTO(
     @NotBlank(message = "El email es obligatorio")
     @Email(message = "El email debe ser válido")

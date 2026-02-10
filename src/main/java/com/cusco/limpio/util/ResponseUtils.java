@@ -7,9 +7,6 @@ import java.time.Instant;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-/**
- * Helper para construir respuestas API consistentes.
- */
 public final class ResponseUtils {
 
 	private ResponseUtils() {}

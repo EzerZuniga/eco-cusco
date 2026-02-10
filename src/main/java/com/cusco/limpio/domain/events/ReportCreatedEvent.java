@@ -2,10 +2,6 @@ package com.cusco.limpio.domain.events;
 
 import java.time.Instant;
 
-/**
- * Evento de dominio que representa la creación de un reporte.
- * Inmutable y ligero, pensado para envío a colas o publicación interna.
- */
 public record ReportCreatedEvent(
 		Long reportId,
 		Long userId,

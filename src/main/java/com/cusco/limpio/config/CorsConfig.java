@@ -15,7 +15,6 @@ public class CorsConfig {
 	public CorsFilter corsFilter() {
 		CorsConfiguration config = new CorsConfiguration();
 
-		// Ajusta estos valores según tus necesidades de seguridad
 		config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:4200"));
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 		config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin"));

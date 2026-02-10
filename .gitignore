@@ -55,8 +55,9 @@ out/
 .settings/
 bin/
 
-# VS Code
-.vscode/
+# VS Code (permitir configuraciones compartidas del proyecto)
+.vscode/*.local.*
+.vscode/settings.local.json
 
 # NetBeans
 /nbproject/private/
@@ -127,7 +128,13 @@ env/
 *.sql.backup
 *.dump
 
+# Scripts locales de ejecución (personalizados por desarrollador)
+run-*.local.ps1
+run-*.local.sh
+init-database.local.sql
+
 # IDE específico del usuario
-.vscode/
+.vscode/*.local.*
+.vscode/settings.local.json
 .idea/workspace.xml
 .idea/tasks.xml

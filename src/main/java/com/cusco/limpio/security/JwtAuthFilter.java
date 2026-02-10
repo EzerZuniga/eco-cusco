@@ -36,7 +36,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(auth);
                 }
             } catch (Exception ex) {
-                // If token invalid, clear context and continue (GlobalExceptionHandler can handle unauthorized responses)
                 SecurityContextHolder.clearContext();
             }
         }
