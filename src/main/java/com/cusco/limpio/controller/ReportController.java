@@ -1,15 +1,25 @@
 package com.cusco.limpio.controller;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.cusco.limpio.dto.report.CreateReportDTO;
 import com.cusco.limpio.dto.report.ReportDTO;
 import com.cusco.limpio.dto.report.UpdateStatusDTO;
 import com.cusco.limpio.service.ReportService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/reports")
@@ -20,7 +30,7 @@ public class ReportController {
 
     @PostMapping
     public ResponseEntity<ReportDTO> createReport(@Validated @RequestBody CreateReportDTO dto,
-                                                  @RequestParam Long userId) {
+            @RequestParam Long userId) {
         ReportDTO created = reportService.createReport(dto, userId);
         return ResponseEntity.ok(created);
     }
@@ -47,7 +57,7 @@ public class ReportController {
 
     @PutMapping("/{id}/status")
     public ResponseEntity<ReportDTO> updateStatus(@PathVariable Long id,
-                                                  @Validated @RequestBody UpdateStatusDTO dto) {
+            @Validated @RequestBody UpdateStatusDTO dto) {
         return ResponseEntity.ok(reportService.updateReportStatus(id, dto));
     }
 
