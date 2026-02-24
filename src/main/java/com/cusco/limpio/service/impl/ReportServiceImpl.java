@@ -1,23 +1,28 @@
 package com.cusco.limpio.service.impl;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.cusco.limpio.domain.enums.ReportStatus;
+import com.cusco.limpio.domain.events.ReportCreatedEvent;
+import com.cusco.limpio.domain.model.Location;
 import com.cusco.limpio.domain.model.Report;
 import com.cusco.limpio.domain.model.User;
 import com.cusco.limpio.dto.report.CreateReportDTO;
 import com.cusco.limpio.dto.report.ReportDTO;
 import com.cusco.limpio.dto.report.UpdateStatusDTO;
 import com.cusco.limpio.exception.ResourceNotFoundException;
+import com.cusco.limpio.mapper.ReportMapper;
 import com.cusco.limpio.repository.LocationRepository;
 import com.cusco.limpio.repository.ReportRepository;
 import com.cusco.limpio.repository.UserRepository;
 import com.cusco.limpio.service.ReportService;
-import com.cusco.limpio.mapper.ReportMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -27,43 +32,48 @@ public class ReportServiceImpl implements ReportService {
     private final UserRepository userRepository;
     private final LocationRepository locationRepository;
     private final ReportMapper reportMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     @Transactional
-    public ReportDTO createReport(CreateReportDTO createReportDTO, Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+    public ReportDTO createReport(CreateReportDTO dto, String authenticatedEmail) {
+        // El usuario siempre se obtiene del token JWT, nunca del cliente
+        User user = userRepository.findByEmail(authenticatedEmail)
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado: " + authenticatedEmail));
 
-        var location = com.cusco.limpio.domain.model.Location.builder()
-                .latitude(createReportDTO.latitude())
-                .longitude(createReportDTO.longitude())
-                .address(createReportDTO.address())
-                .district(createReportDTO.district())
-                .build();
+        Location location = locationRepository.save(
+                Location.builder()
+                        .latitude(dto.latitude())
+                        .longitude(dto.longitude())
+                        .address(dto.address())
+                        .district(dto.district())
+                        .build());
 
-        location = locationRepository.save(location);
+        Report report = reportRepository.save(
+                Report.builder()
+                        .title(dto.title())
+                        .description(dto.description())
+                        .category(dto.category())
+                        .photoUrls(dto.photoUrls() == null ? List.of() : dto.photoUrls())
+                        .user(user)
+                        .location(location)
+                        .status(ReportStatus.PENDIENTE)
+                        .createdAt(LocalDateTime.now())
+                        .build());
 
-        Report report = Report.builder()
-                .title(createReportDTO.title())
-                .description(createReportDTO.description())
-                .category(createReportDTO.category())
-                .photoUrls(createReportDTO.photoUrls() == null ? List.of() : createReportDTO.photoUrls())
-                .user(user)
-                .location(location)
-                .status(ReportStatus.PENDIENTE)
-                .createdAt(LocalDateTime.now())
-                .build();
+        // Publicar evento de dominio para integraciones futuras (notificaciones,
+        // auditoría, etc.)
+        eventPublisher.publishEvent(
+                ReportCreatedEvent.of(report.getId(), user.getId(), report.getTitle(),
+                        report.getCategory(), location.getDistrict()));
 
-        Report saved = reportRepository.save(report);
-        return reportMapper.toDTO(saved);
+        return reportMapper.toDTO(report);
     }
 
     @Override
     @Transactional(readOnly = true)
     public ReportDTO getReportById(Long id) {
-        Report report = reportRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Report not found with id: " + id));
-        return reportMapper.toDTO(report);
+        return reportMapper.toDTO(findReportOrThrow(id));
     }
 
     @Override
@@ -85,12 +95,7 @@ public class ReportServiceImpl implements ReportService {
     @Override
     @Transactional(readOnly = true)
     public List<ReportDTO> getReportsByStatus(String status) {
-        ReportStatus rs;
-        try {
-            rs = ReportStatus.valueOf(status.toUpperCase());
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid status: " + status);
-        }
+        ReportStatus rs = ReportStatus.from(status); // usa el parser con mensajes claros
         return reportRepository.findByStatus(rs).stream()
                 .map(reportMapper::toDTO)
                 .toList();
@@ -106,31 +111,34 @@ public class ReportServiceImpl implements ReportService {
 
     @Override
     @Transactional
-    public ReportDTO updateReportStatus(Long id, UpdateStatusDTO updateStatusDTO) {
-        Report report = reportRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Report not found with id: " + id));
+    public ReportDTO updateReportStatus(Long id, UpdateStatusDTO dto) {
+        Report report = findReportOrThrow(id);
 
-        report.setStatus(updateStatusDTO.status());
+        report.setStatus(dto.status());
         report.setUpdatedAt(LocalDateTime.now());
-
         report.getStatusHistory().add(
                 Report.StatusHistory.builder()
-                        .status(updateStatusDTO.status())
+                        .status(dto.status())
                         .timestamp(LocalDateTime.now())
-                        .notes(updateStatusDTO.notes())
-                        .build()
-        );
+                        .notes(dto.notes())
+                        .build());
 
-        Report updated = reportRepository.save(report);
-        return reportMapper.toDTO(updated);
+        return reportMapper.toDTO(reportRepository.save(report));
     }
 
     @Override
     @Transactional
     public void deleteReport(Long id) {
         if (!reportRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Report not found with id: " + id);
+            throw new ResourceNotFoundException("Reporte no encontrado con id: " + id);
         }
         reportRepository.deleteById(id);
+    }
+
+    // ── Helpers ─────────────────────────────────────────────────────────────
+
+    private Report findReportOrThrow(Long id) {
+        return reportRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Reporte no encontrado con id: " + id));
     }
 }

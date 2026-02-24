@@ -5,6 +5,7 @@ import java.util.Arrays;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -50,18 +51,24 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> {
-                    auth.requestMatchers(
-                            "/api/health/**",
-                            "/api/users",
-                            "/api/users/login",
-                            "/swagger-ui/**",
-                            "/v3/api-docs/**",
-                            "/swagger-ui.html").permitAll();
 
+                    // Rutas completamente públicas
+                    auth.requestMatchers("/api/health/**").permitAll();
+                    auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll();
+
+                    // Registro: solo POST /api/users es público. GET /api/users requiere
+                    // autenticación.
+                    auth.requestMatchers(HttpMethod.POST, "/api/users").permitAll();
+
+                    // Login: POST /api/users/login es público
+                    auth.requestMatchers(HttpMethod.POST, "/api/users/login").permitAll();
+
+                    // Consola H2 solo en perfil de desarrollo
                     if (isDevelopmentProfile()) {
                         auth.requestMatchers("/h2-console/**").permitAll();
                     }
 
+                    // Cualquier otra petición requiere autenticación
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
@@ -74,7 +81,6 @@ public class SecurityConfig {
     }
 
     private boolean isDevelopmentProfile() {
-        String[] activeProfiles = environment.getActiveProfiles();
-        return Arrays.asList(activeProfiles).contains("dev");
+        return Arrays.asList(environment.getActiveProfiles()).contains("dev");
     }
 }

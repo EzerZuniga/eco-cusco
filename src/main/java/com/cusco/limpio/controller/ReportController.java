@@ -2,16 +2,17 @@ package com.cusco.limpio.controller;
 
 import java.util.List;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cusco.limpio.dto.report.CreateReportDTO;
@@ -28,11 +29,20 @@ public class ReportController {
 
     private final ReportService reportService;
 
+    /**
+     * Crea un nuevo reporte.
+     * El usuario autor se extrae del token JWT para evitar suplantación de
+     * identidad.
+     * Retorna 201 Created con el recurso creado.
+     */
     @PostMapping
-    public ResponseEntity<ReportDTO> createReport(@Validated @RequestBody CreateReportDTO dto,
-            @RequestParam Long userId) {
-        ReportDTO created = reportService.createReport(dto, userId);
-        return ResponseEntity.ok(created);
+    public ResponseEntity<ReportDTO> createReport(
+            @Validated @RequestBody CreateReportDTO dto,
+            Authentication authentication) {
+        // authentication.getName() retorna el email del usuario autenticado (subject
+        // del JWT)
+        ReportDTO created = reportService.createReport(dto, authentication.getName());
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @GetMapping("/{id}")
@@ -55,8 +65,14 @@ public class ReportController {
         return ResponseEntity.ok(reportService.getReportsByStatus(status));
     }
 
-    @PutMapping("/{id}/status")
-    public ResponseEntity<ReportDTO> updateStatus(@PathVariable Long id,
+    /**
+     * Actualiza el estado de un reporte.
+     * Se usa PATCH (modificación parcial) en lugar de PUT (reemplazo total),
+     * que es el verbo REST correcto para este caso.
+     */
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ReportDTO> updateStatus(
+            @PathVariable Long id,
             @Validated @RequestBody UpdateStatusDTO dto) {
         return ResponseEntity.ok(reportService.updateReportStatus(id, dto));
     }

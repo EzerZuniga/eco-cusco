@@ -1,11 +1,17 @@
 package com.cusco.limpio.service.impl;
 
-import com.cusco.limpio.domain.model.User;
-import com.cusco.limpio.dto.user.CreateUserDTO;
-import com.cusco.limpio.dto.user.UserDTO;
-import com.cusco.limpio.mapper.UserMapper;
-import com.cusco.limpio.repository.UserRepository;
-import com.cusco.limpio.security.JwtTokenProvider;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,14 +20,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.LocalDateTime;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
+import com.cusco.limpio.domain.model.User;
+import com.cusco.limpio.dto.user.CreateUserDTO;
+import com.cusco.limpio.dto.user.UserDTO;
+import com.cusco.limpio.exception.BadRequestException;
+import com.cusco.limpio.mapper.UserMapper;
+import com.cusco.limpio.repository.UserRepository;
+import com.cusco.limpio.security.JwtTokenProvider;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
@@ -52,9 +57,8 @@ class UserServiceImplTest {
                 "password123",
                 "John",
                 "Doe",
-                "999999999",
-                "USER"
-        );
+                "+51999999999",
+                "CITIZEN");
 
         user = User.builder()
                 .id(1L)
@@ -62,7 +66,7 @@ class UserServiceImplTest {
                 .password("encodedPassword")
                 .firstName("John")
                 .lastName("Doe")
-                .phone("999999999")
+                .phone("+51999999999")
                 .role(User.UserRole.CITIZEN)
                 .active(true)
                 .createdAt(LocalDateTime.now())
@@ -73,11 +77,10 @@ class UserServiceImplTest {
                 "test@example.com",
                 "John",
                 "Doe",
-                "999999999",
-                "USER",
+                "+51999999999",
+                "CITIZEN",
                 true,
-                LocalDateTime.now()
-        );
+                LocalDateTime.now());
     }
 
     @Test
@@ -99,14 +102,14 @@ class UserServiceImplTest {
     }
 
     @Test
-    void createUser_ShouldThrowException_WhenEmailAlreadyExists() {
+    void createUser_ShouldThrowBadRequestException_WhenEmailAlreadyExists() {
         // Given
         when(userRepository.existsByEmail(anyString())).thenReturn(true);
 
         // When & Then
         assertThatThrownBy(() -> userService.createUser(createUserDTO))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("Email already exists");
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("El email ya está registrado");
 
         verify(userRepository, times(1)).existsByEmail(createUserDTO.email());
         verify(userRepository, never()).save(any(User.class));

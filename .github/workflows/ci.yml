@@ -7,8 +7,9 @@ on:
     branches: [ main, develop ]
 
 jobs:
+  # ── Job 1: Build, Test y Package ────────────────────────────────────────────
   build-and-test:
-    name: Build and Test
+    name: Build & Test
     runs-on: ubuntu-latest
 
     services:
@@ -27,60 +28,72 @@ jobs:
           --health-retries 5
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: maven
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
 
-    - name: Cache Maven packages
-      uses: actions/cache@v3
-      with:
-        path: ~/.m2
-        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-        restore-keys: ${{ runner.os }}-m2
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
-    - name: Build with Maven
-      run: ./mvnw clean compile -DskipTests
+      - name: Compile
+        run: ./mvnw clean compile -DskipTests -B
 
-    - name: Run tests
-      env:
-        SPRING_PROFILES_ACTIVE: test
-        SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/eco_cusco_test
-        SPRING_DATASOURCE_USERNAME: postgres
-        SPRING_DATASOURCE_PASSWORD: postgres
-      run: ./mvnw test
+      - name: Run tests
+        env:
+          SPRING_PROFILES_ACTIVE: test
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/eco_cusco_test
+          SPRING_DATASOURCE_USERNAME: postgres
+          SPRING_DATASOURCE_PASSWORD: postgres
+        run: ./mvnw test -B
 
-    - name: Package application
-      run: ./mvnw package -DskipTests
+      - name: Package application
+        run: ./mvnw package -DskipTests -B
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: cusco-limpio-api
-        path: target/*.jar
-        retention-days: 7
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: cusco-limpio-api
+          path: target/*.jar
+          retention-days: 7
 
+  # ── Job 2: Análisis de Calidad de Código ────────────────────────────────────
   code-quality:
-    name: Code Quality Analysis
+    name: Code Quality
     runs-on: ubuntu-latest
+    needs: build-and-test          # Solo corre si el build pasa
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: maven
 
-    - name: Run checkstyle
-      run: ./mvnw checkstyle:check || true
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
-    - name: Verify code compilation
-      run: ./mvnw clean verify -DskipTests
+      - name: Run Checkstyle
+        run: ./mvnw checkstyle:check -B || true
+
+      - name: Verify compilation (sin tests)
+        run: ./mvnw clean verify -DskipTests -B
