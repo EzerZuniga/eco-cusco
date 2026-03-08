@@ -25,11 +25,12 @@ POST {{baseUrl}}/api/users
 Content-Type: {{contentType}}
 
 {
-  "name": "Juan Pérez",
   "email": "juan.perez@example.com",
   "password": "SecurePass123!",
+  "firstName": "Juan",
+  "lastName": "Pérez",
   "phone": "+51987654321",
-  "dni": "12345678"
+  "role": "CITIZEN"
 }
 
 ### Login
@@ -57,7 +58,8 @@ Authorization: {{token}}
 Content-Type: {{contentType}}
 
 {
-  "name": "Juan Pérez Actualizado",
+  "firstName": "Juan",
+  "lastName": "Pérez Actualizado",
   "phone": "+51999888777"
 }
 
@@ -112,17 +114,12 @@ DELETE {{baseUrl}}/api/reports/{{reportId}}
 Authorization: {{token}}
 
 ### Filter Reports by Status (requires auth)
-GET {{baseUrl}}/api/reports?status=PENDING
+GET {{baseUrl}}/api/reports/status/PENDING
 Authorization: {{token}}
 Accept: application/json
 
-### Filter Reports by Category (requires auth)
-GET {{baseUrl}}/api/reports?category=Residuos Sólidos
-Authorization: {{token}}
-Accept: application/json
-
-### Search Reports Near Location (requires auth)
-GET {{baseUrl}}/api/reports?latitude=-13.5226131&longitude=-71.9673550&radiusMeters=5000
+### Get Reports by User (requires auth)
+GET {{baseUrl}}/api/reports/user/{{userId}}
 Authorization: {{token}}
 Accept: application/json
 
