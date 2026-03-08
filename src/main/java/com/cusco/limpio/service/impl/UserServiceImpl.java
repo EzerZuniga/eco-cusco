@@ -25,6 +25,7 @@ import com.cusco.limpio.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 
+@SuppressWarnings("null")
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -145,10 +146,14 @@ public class UserServiceImpl implements UserService {
     // Verifica que el usuario autenticado sea el propietario del recurso o un ADMIN
     private void assertOwnerOrAdmin(User targetUser, String authenticatedEmail) {
         boolean isOwner = targetUser.getEmail().equalsIgnoreCase(authenticatedEmail);
-        boolean isAdmin = targetUser.getRole() == User.UserRole.ADMIN;
 
-        if (!isOwner && !isAdmin) {
-            throw new ForbiddenException("No tienes autorización para modificar este usuario");
+        if (!isOwner) {
+            User authenticatedUser = userRepository.findByEmail(authenticatedEmail)
+                    .orElseThrow(() -> new UnauthorizedException("Usuario autenticado no encontrado"));
+            boolean isAdmin = authenticatedUser.getRole() == User.UserRole.ADMIN;
+            if (!isAdmin) {
+                throw new ForbiddenException("No tienes autorización para modificar este usuario");
+            }
         }
     }
 }

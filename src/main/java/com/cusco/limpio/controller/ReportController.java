@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -67,10 +68,10 @@ public class ReportController {
 
     /**
      * Actualiza el estado de un reporte.
-     * Se usa PATCH (modificación parcial) en lugar de PUT (reemplazo total),
-     * que es el verbo REST correcto para este caso.
+     * Solo ADMIN o MUNICIPAL_AGENT pueden cambiar estados.
      */
     @PatchMapping("/{id}/status")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MUNICIPAL_AGENT')")
     public ResponseEntity<ReportDTO> updateStatus(
             @PathVariable Long id,
             @Validated @RequestBody UpdateStatusDTO dto) {
@@ -78,6 +79,7 @@ public class ReportController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         reportService.deleteReport(id);
         return ResponseEntity.noContent().build();

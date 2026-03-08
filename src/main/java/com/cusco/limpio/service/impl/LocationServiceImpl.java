@@ -1,15 +1,18 @@
 package com.cusco.limpio.service.impl;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.cusco.limpio.domain.model.Location;
 import com.cusco.limpio.exception.ResourceNotFoundException;
 import com.cusco.limpio.repository.LocationRepository;
 import com.cusco.limpio.service.LocationService;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
+@SuppressWarnings("null")
 @Service
 @RequiredArgsConstructor
 public class LocationServiceImpl implements LocationService {

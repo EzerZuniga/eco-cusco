@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -17,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.cusco.limpio.security.JwtAuthFilter;
@@ -50,14 +52,26 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .headers(headers -> {
+                    headers.contentTypeOptions(cto -> {
+                    });
+                    headers.xssProtection(xss -> {
+                    });
+                    if (isDevelopmentProfile()) {
+                        headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable);
+                    } else {
+                        headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::deny);
+                    }
+                })
+                .exceptionHandling(eh -> eh
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .authorizeHttpRequests(auth -> {
 
                     // Rutas completamente públicas
                     auth.requestMatchers("/api/health/**").permitAll();
                     auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll();
 
-                    // Registro: solo POST /api/users es público. GET /api/users requiere
-                    // autenticación.
+                    // Registro: solo POST /api/users es público
                     auth.requestMatchers(HttpMethod.POST, "/api/users").permitAll();
 
                     // Login: POST /api/users/login es público
@@ -72,10 +86,6 @@ public class SecurityConfig {
                     auth.anyRequest().authenticated();
                 })
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
-
-        if (isDevelopmentProfile()) {
-            http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable));
-        }
 
         return http.build();
     }

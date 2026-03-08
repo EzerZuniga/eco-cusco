@@ -28,6 +28,7 @@ import com.cusco.limpio.mapper.UserMapper;
 import com.cusco.limpio.repository.UserRepository;
 import com.cusco.limpio.security.JwtTokenProvider;
 
+@SuppressWarnings("null")
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
 

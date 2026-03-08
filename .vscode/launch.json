@@ -22,9 +22,9 @@
       "mainClass": "com.cusco.limpio.CuscoLimpioApiApplication",
       "projectName": "cusco-limpio-api",
       "args": "",
+      "envFile": "${workspaceFolder}/.env",
       "env": {
-        "SPRING_PROFILES_ACTIVE": "postgres",
-        "SPRING_DATASOURCE_PASSWORD": "zuniga2026"
+        "SPRING_PROFILES_ACTIVE": "postgres"
       },
       "console": "internalConsole"
     },

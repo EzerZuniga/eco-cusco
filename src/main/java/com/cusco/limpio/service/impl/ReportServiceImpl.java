@@ -24,6 +24,7 @@ import com.cusco.limpio.service.ReportService;
 
 import lombok.RequiredArgsConstructor;
 
+@SuppressWarnings("null")
 @Service
 @RequiredArgsConstructor
 public class ReportServiceImpl implements ReportService {

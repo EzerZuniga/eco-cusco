@@ -79,6 +79,11 @@ ehthumbs_vista.db
 Desktop.ini
 $RECYCLE.BIN/
 
+# Environment files (NEVER commit secrets)
+.env
+.env.*
+!.env.example
+
 # Application specific
 application-local.properties
 application-secret.properties

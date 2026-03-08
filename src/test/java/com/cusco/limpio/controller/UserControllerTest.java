@@ -22,49 +22,50 @@ import com.cusco.limpio.dto.user.UserDTO;
 import com.cusco.limpio.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+@SuppressWarnings("null")
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class UserControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+        @Autowired
+        private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
+        @Autowired
+        private ObjectMapper objectMapper;
 
-    @MockBean
-    private UserService userService;
+        @MockBean
+        private UserService userService;
 
-    @Test
-    void createUser_ShouldReturnCreated_WhenValidRequest() throws Exception {
-        // Given
-        CreateUserDTO createUserDTO = new CreateUserDTO(
-                "test@example.com",
-                "password123",
-                "John",
-                "Doe",
-                "+51999999999",
-                "CITIZEN");
+        @Test
+        void createUser_ShouldReturnCreated_WhenValidRequest() throws Exception {
+                // Given
+                CreateUserDTO createUserDTO = new CreateUserDTO(
+                                "test@example.com",
+                                "password123",
+                                "John",
+                                "Doe",
+                                "+51999999999",
+                                "CITIZEN");
 
-        UserDTO userDTO = new UserDTO(
-                1L,
-                "test@example.com",
-                "John",
-                "Doe",
-                "+51999999999",
-                "CITIZEN",
-                true,
-                LocalDateTime.now());
+                UserDTO userDTO = new UserDTO(
+                                1L,
+                                "test@example.com",
+                                "John",
+                                "Doe",
+                                "+51999999999",
+                                "CITIZEN",
+                                true,
+                                LocalDateTime.now());
 
-        when(userService.createUser(any(CreateUserDTO.class))).thenReturn(userDTO);
+                when(userService.createUser(any(CreateUserDTO.class))).thenReturn(userDTO);
 
-        // When & Then
-        // El controlador retorna directamente el UserDTO, no envuelto en "data"
-        mockMvc.perform(post("/api/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(createUserDTO)))
-                .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.email").value("test@example.com"));
-    }
+                // When & Then
+                // El controlador retorna directamente el UserDTO, no envuelto en "data"
+                mockMvc.perform(post("/api/users")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(createUserDTO)))
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.email").value("test@example.com"));
+        }
 }
