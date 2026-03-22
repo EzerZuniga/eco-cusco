@@ -1,4 +1,4 @@
-# Arquitectura del Proyecto - Eco Cusco API
+﻿# Arquitectura del Proyecto - Eco Cusco API
 
 ## Visión General
 
@@ -86,6 +86,33 @@ Responsabilidad: acceso a datos y configuración técnica.
 - Registro público en `POST /api/users` (rol público: `CITIZEN`).
 - Endpoints protegidos por defecto.
 - Reglas por rol con `@PreAuthorize` en operaciones sensibles.
+
+## Ventajas de esta Arquitectura
+
+### Mantenibilidad
+- Separación clara de responsabilidades
+- Fácil localización de código
+- Cambios aislados por capa
+
+### Testabilidad
+- Capas independientes
+- Fácil mockeado de dependencias
+- Tests unitarios e integración
+
+### Escalabilidad
+- Capas horizontales escalables
+- Microservicios potenciales
+- Cacheo por capa
+
+### Seguridad
+- Filtros centralizados
+- JWT stateless
+- Validaciones en múltiples capas
+
+### Flexibilidad
+- Fácil cambio de providers (BD, auth, etc.)
+- Perfiles de entorno
+- Configuración externalizada
 
 ## Endpoints Implementados
 
