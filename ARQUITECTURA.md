@@ -1,12 +1,12 @@
 # Arquitectura del Proyecto - Eco Cusco API
 
-## 📐 Visión General
+## Visión General
 
 Eco Cusco API sigue una **arquitectura en capas limpia** (Clean Architecture) con separación clara de responsabilidades.
 
 --- 
 
-## 🏗️ Estructura de Capas
+## Estructura de Capas
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -46,7 +46,7 @@ Eco Cusco API sigue una **arquitectura en capas limpia** (Clean Architecture) co
 
 ---
 
-## 📂 Estructura de Directorios Detallada
+## Estructura de Directorios Detallada
 
 ```
 eco-cusco/
@@ -159,7 +159,7 @@ eco-cusco/
 
 ---
 
-## 🔄 Flujo de Datos
+## Flujo de Datos
 
 ### Request Flow (Cliente → Servidor)
 
@@ -205,7 +205,7 @@ Cliente HTTP
 
 ---
 
-## 🛡️ Flujo de Seguridad
+## Flujo de Seguridad
 
 ```
 1. Usuario envía: POST /api/auth/login
@@ -237,7 +237,7 @@ Cliente HTTP
 
 ---
 
-## 🔌 Endpoints por Capa
+## Endpoints por Capa
 
 ### Health Check
 ```
@@ -271,7 +271,7 @@ GET    /api/reports/status/{sts} → ReportController → ReportService → Repo
 
 ---
 
-## 🧩 Patrones de Diseño Utilizados
+## Patrones de Diseño Utilizados
 
 ### 1. **Repository Pattern**
 - Abstrae acceso a datos
@@ -304,7 +304,7 @@ GET    /api/reports/status/{sts} → ReportController → ReportService → Repo
 
 ---
 
-## 📊 Diagrama de Componentes
+## Diagrama de Componentes
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -342,36 +342,36 @@ GET    /api/reports/status/{sts} → ReportController → ReportService → Repo
 
 ---
 
-## 🎯 Ventajas de esta Arquitectura
+## Ventajas de esta Arquitectura
 
-### ✅ Mantenibilidad
+### Mantenibilidad
 - Separación clara de responsabilidades
 - Fácil localización de código
 - Cambios aislados por capa
 
-### ✅ Testabilidad
+### Testabilidad
 - Capas independientes
 - Fácil mockeado de dependencias
 - Tests unitarios e integración
 
-### ✅ Escalabilidad
+### Escalabilidad
 - Capas horizontales escalables
 - Microservicios potenciales
 - Cacheo por capa
 
-### ✅ Seguridad
+### Seguridad
 - Filtros centralizados
 - JWT stateless
 - Validaciones en múltiples capas
 
-### ✅ Flexibilidad
+### Flexibilidad
 - Fácil cambio de providers (BD, auth, etc.)
 - Perfiles de entorno
 - Configuración externalizada
 
 ---
 
-## 📚 Referencias Arquitectónicas
+## Referencias Arquitectónicas
 
 - [Clean Architecture - Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 - [Spring Boot Reference](https://docs.spring.io/spring-boot/docs/current/reference/html/)
