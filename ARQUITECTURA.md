@@ -1,378 +1,134 @@
 # Arquitectura del Proyecto - Eco Cusco API
 
-## 📐 Visión General
+## Visión General
 
-Eco Cusco API sigue una **arquitectura en capas limpia** (Clean Architecture) con separación clara de responsabilidades.
+Eco Cusco API está construida como una API REST en capas sobre Spring Boot.
+La aplicación separa responsabilidades en: presentación, aplicación, dominio e infraestructura.
 
---- 
+## Estructura Real del Proyecto
 
-## 🏗️ Estructura de Capas
+```text
+src/main/java/com/cusco/limpio/
+├── config/         # Seguridad, CORS y OpenAPI
+├── controller/     # Endpoints REST
+├── domain/         # Entidades, enums y eventos de dominio
+├── dto/            # Contratos de entrada/salida
+├── exception/      # Excepciones de negocio + manejador global
+├── mapper/         # Conversión Entity <-> DTO
+├── repository/     # Repositorios JPA
+├── security/       # JWT filter, token provider, user details
+├── service/        # Interfaces de servicio
+│   └── impl/       # Implementaciones de negocio
+└── CuscoLimpioApiApplication.java
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                    PRESENTATION LAYER                    │
-│  ┌───────────────┐  ┌──────────────┐  ┌──────────────┐ │
-│  │  Controllers  │  │    DTOs      │  │  Exception   │ │
-│  │   (REST API)  │  │  (Request/   │  │   Handlers   │ │
-│  │               │  │   Response)  │  │              │ │
-│  └───────────────┘  └──────────────┘  └──────────────┘ │
-└─────────────────────────────────────────────────────────┘
-                            ▼
-┌─────────────────────────────────────────────────────────┐
-│                    APPLICATION LAYER                     │
-│  ┌───────────────┐  ┌──────────────┐  ┌──────────────┐ │
-│  │   Services    │  │   Mappers    │  │   Security   │ │
-│  │  (Business    │  │  (Entity ↔   │  │    (JWT,     │ │
-│  │    Logic)     │  │     DTO)     │  │   Filters)   │ │
-│  └───────────────┘  └──────────────┘  └──────────────┘ │
-└─────────────────────────────────────────────────────────┘
-                            ▼
-┌─────────────────────────────────────────────────────────┐
-│                     DOMAIN LAYER                         │
-│  ┌───────────────┐  ┌──────────────┐  ┌──────────────┐ │
-│  │   Entities    │  │    Enums     │  │    Events    │ │
-│  │   (JPA)       │  │  (Status)    │  │  (Domain)    │ │
-│  └───────────────┘  └──────────────┘  └──────────────┘ │
-└─────────────────────────────────────────────────────────┘
-                            ▼
-┌─────────────────────────────────────────────────────────┐
-│                  INFRASTRUCTURE LAYER                    │
-│  ┌───────────────┐  ┌──────────────┐  ┌──────────────┐ │
-│  │ Repositories  │  │  Database    │  │    Config    │ │
-│  │   (JPA)       │  │  (H2/PG)     │  │  (Spring)    │ │
-│  └───────────────┘  └──────────────┘  └──────────────┘ │
-└─────────────────────────────────────────────────────────┘
+src/main/resources/
+├── application.properties
+├── application-dev.properties
+├── application-postgres.properties
+├── application-prod.properties
+└── db/
+    ├── h2/
+    │   ├── schema.sql
+    │   └── data.sql
+    └── postgres/
+        ├── schema.sql
+        └── data.sql
 ```
 
----
+## Flujo de Petición
 
-## 📂 Estructura de Directorios Detallada
+1. La petición entra por `SecurityFilterChain`.
+2. `JwtAuthFilter` valida token si existe.
+3. El `Controller` valida DTOs (`@Validated`).
+4. El `Service` ejecuta reglas de negocio.
+5. El `Repository` persiste/consulta entidades.
+6. `Mapper` convierte entidades a DTOs de salida.
+7. `GlobalExceptionHandler` traduce errores a respuestas HTTP consistentes.
 
-```
-eco-cusco/
-│
-├── 📁 src/
-│   ├── 📁 main/
-│   │   ├── 📁 java/com/cusco/limpio/
-│   │   │   │
-│   │   │   ├── 📁 config/                [Configuración]
-│   │   │   │   ├── CorsConfig.java
-│   │   │   │   ├── OpenApiConfig.java
-│   │   │   │   └── SecurityConfig.java
-│   │   │   │
-│   │   │   ├── 📁 controller/            [Capa de Presentación]
-│   │   │   │   ├── HealthCheckController.java
-│   │   │   │   ├── ReportController.java
-│   │   │   │   └── UserController.java
-│   │   │   │
-│   │   │   ├── 📁 domain/                [Capa de Dominio]
-│   │   │   │   ├── 📁 enums/
-│   │   │   │   │   └── ReportStatus.java
-│   │   │   │   ├── 📁 events/
-│   │   │   │   │   └── ReportCreatedEvent.java
-│   │   │   │   └── 📁 model/
-│   │   │   │       ├── Location.java
-│   │   │   │       ├── Report.java
-│   │   │   │       └── User.java
-│   │   │   │
-│   │   │   ├── 📁 dto/                   [Data Transfer Objects]
-│   │   │   │   ├── 📁 report/
-│   │   │   │   │   ├── CreateReportDTO.java
-│   │   │   │   │   ├── ReportDTO.java
-│   │   │   │   │   └── UpdateStatusDTO.java
-│   │   │   │   └── 📁 user/
-│   │   │   │       ├── AuthResponseDTO.java
-│   │   │   │       ├── CreateUserDTO.java
-│   │   │   │       ├── LoginDTO.java
-│   │   │   │       └── UserDTO.java
-│   │   │   │
-│   │   │   ├── 📁 exception/             [Manejo de Excepciones]
-│   │   │   │   ├── BadRequestException.java
-│   │   │   │   ├── ForbiddenException.java
-│   │   │   │   ├── GlobalExceptionHandler.java
-│   │   │   │   ├── ResourceNotFoundException.java
-│   │   │   │   └── UnauthorizedException.java
-│   │   │   │
-│   │   │   ├── 📁 mapper/                [Mappers Entity ↔ DTO]
-│   │   │   │   ├── ReportMapper.java
-│   │   │   │   └── UserMapper.java
-│   │   │   │
-│   │   │   ├── 📁 repository/            [Capa de Infraestructura]
-│   │   │   │   ├── LocationRepository.java
-│   │   │   │   ├── ReportRepository.java
-│   │   │   │   └── UserRepository.java
-│   │   │   │
-│   │   │   ├── 📁 security/              [Seguridad]
-│   │   │   │   ├── JwtAuthFilter.java
-│   │   │   │   ├── JwtTokenProvider.java
-│   │   │   │   └── UserDetailsServiceImpl.java
-│   │   │   │
-│   │   │   ├── 📁 service/               [Capa de Aplicación]
-│   │   │   │   ├── 📁 impl/
-│   │   │   │   │   ├── LocationServiceImpl.java
-│   │   │   │   │   ├── ReportServiceImpl.java
-│   │   │   │   │   └── UserServiceImpl.java
-│   │   │   │   ├── LocationService.java
-│   │   │   │   ├── ReportService.java
-│   │   │   │   └── UserService.java
-│   │   │   │
-│   │   │   ├── 📁 util/                  [Utilidades]
-│   │   │   │   ├── DateUtils.java
-│   │   │   │   ├── GeoUtils.java
-│   │   │   │   └── ResponseUtils.java
-│   │   │   │
-│   │   │   └── CuscoLimpioApiApplication.java
-│   │   │
-│   │   └── 📁 resources/
-│   │       ├── application.properties
-│   │       ├── application-dev.properties
-│   │       ├── application-postgres.properties
-│   │       ├── application-prod.properties
-│   │       ├── banner.txt
-│   │       └── 📁 db/
-│   │           ├── 📁 h2/
-│   │           │   ├── schema.sql
-│   │           │   └── data.sql
-│   │           └── 📁 postgres/
-│   │               ├── schema.sql
-│   │               └── data.sql
-│   │
-│   └── 📁 test/
-│       ├── 📁 java/com/cusco/limpio/
-│       │   ├── 📁 controller/
-│       │   │   └── UserControllerTest.java
-│       │   ├── 📁 service/impl/
-│       │   │   └── UserServiceImplTest.java
-│       │   └── CuscoLimpioApiApplicationTests.java
-│       │
-│       └── 📁 resources/
-│           └── application-test.properties
-│
-├── 📄 .editorconfig                      [Configuración de editor]
-├── 📄 .gitignore                         [Git ignore]
-├── 📄 CONTRIBUTING.md                    [Guía contribución]
-├── 📄 LICENSE                            [Licencia MIT]
-├── 📄 mvnw.cmd                          [Maven wrapper]
-├── 📄 pom.xml                           [Configuración Maven]
-└── 📄 README.md                         [Documentación]
-```
+## Capas y Responsabilidades
 
----
+### Presentación
 
-## 🔄 Flujo de Datos
+- `UserController`
+- `ReportController`
+- `HealthCheckController`
 
-### Request Flow (Cliente → Servidor)
+Responsabilidad: exponer endpoints HTTP, validar entrada y delegar al servicio.
 
-```
-Cliente HTTP
-    ↓
-[CORS Filter]                    # Valida origen de la petición
-    ↓
-[JWT Auth Filter]                # Valida token JWT
-    ↓
-[Controller]                     # Recibe petición HTTP
-    ↓
-[DTO Validation]                 # Valida datos de entrada
-    ↓
-[Service]                        # Lógica de negocio
-    ↓
-[Mapper: DTO → Entity]           # Convierte DTO a Entity
-    ↓
-[Repository]                     # Acceso a datos
-    ↓
-[Database]                       # Persistencia
-```
+### Aplicación
 
-### Response Flow (Servidor → Cliente)
-
-```
-[Database]
-    ↓
-[Repository]                     # Recupera datos
-    ↓
-[Entity]
-    ↓
-[Mapper: Entity → DTO]           # Convierte Entity a DTO
-    ↓
-[Service]                        # Procesa la respuesta
-    ↓
-[Controller]                     # Formatea respuesta
-    ↓
-[ResponseEntity<ApiResponse>]    # Respuesta estandarizada
-    ↓
-Cliente HTTP
-```
-
----
-
-## 🛡️ Flujo de Seguridad
-
-```
-1. Usuario envía: POST /api/auth/login
-   {
-     "email": "user@example.com",
-     "password": "******"
-   }
-
-2. UserService valida credenciales
-   ↓
-3. JwtTokenProvider genera token
-   ↓
-4. Respuesta con token:
-   {
-     "token": "eyJhbGc...",
-     "expiresIn": 86400000,
-     "user": {...}
-   }
-
-5. Cliente incluye token en requests:
-   Authorization: Bearer eyJhbGc...
-   ↓
-6. JwtAuthFilter valida token
-   ↓
-7. SecurityContext actualizado
-   ↓
-8. Controller autoriza acceso
-```
-
----
-
-## 🔌 Endpoints por Capa
-
-### Health Check
-```
-GET /health → HealthCheckController → (No autenticación)
-```
-
-### Authentication
-```
-POST /api/auth/login → UserController → UserService → JWT
-POST /api/auth/register → UserController → UserService → Repository
-```
-
-### Users (Requiere autenticación)
-```
-GET    /api/users      → UserController → UserService → UserRepository
-GET    /api/users/{id} → UserController → UserService → UserRepository
-POST   /api/users      → UserController → UserService → UserRepository
-PUT    /api/users/{id} → UserController → UserService → UserRepository
-DELETE /api/users/{id} → UserController → UserService → UserRepository
-```
-
-### Reports (Requiere autenticación)
-```
-GET    /api/reports              → ReportController → ReportService → ReportRepository
-GET    /api/reports/{id}         → ReportController → ReportService → ReportRepository
-POST   /api/reports              → ReportController → ReportService → ReportRepository
-PATCH  /api/reports/{id}/status  → ReportController → ReportService → ReportRepository
-GET    /api/reports/user/{id}    → ReportController → ReportService → ReportRepository
-GET    /api/reports/status/{sts} → ReportController → ReportService → ReportRepository
-```
-
----
-
-## 🧩 Patrones de Diseño Utilizados
-
-### 1. **Repository Pattern**
-- Abstrae acceso a datos
-- `UserRepository`, `ReportRepository`, `LocationRepository`
-
-### 2. **Service Layer Pattern**
-- Encapsula lógica de negocio
-- Interfaces: `UserService`, `ReportService`
-- Implementaciones en `impl/`
-
-### 3. **DTO Pattern**
-- Separa representación externa de entidades internas
-- DTOs en `dto/report/` y `dto/user/`
-
-### 4. **Mapper Pattern**
-- Conversión Entity ↔ DTO
+- `UserService` / `UserServiceImpl`
+- `ReportService` / `ReportServiceImpl`
 - `UserMapper`, `ReportMapper`
 
-### 5. **Builder Pattern (Lombok)**
-- Construcción de objetos complejos
-- `@Builder` en entidades
+Responsabilidad: lógica de negocio, autorización a nivel de caso de uso, mapeos de datos.
 
-### 6. **Dependency Injection**
-- `@RequiredArgsConstructor` (Lombok)
-- Constructor injection
+### Dominio
 
-### 7. **Global Exception Handler**
-- `@ControllerAdvice`
-- Manejo centralizado de errores
+- Entidades: `User`, `Report`, `Location`
+- Enum: `ReportStatus`
+- Evento: `ReportCreatedEvent`
 
----
+Responsabilidad: modelo del negocio y estados válidos.
 
-## 📊 Diagrama de Componentes
+### Infraestructura
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        FRONTEND                              │
-│                    (React/Angular/Vue)                       │
-└─────────────────────────────────────────────────────────────┘
-                             ▼ HTTP/REST
-┌─────────────────────────────────────────────────────────────┐
-│                      API GATEWAY                             │
-│                    (Spring Security)                         │
-│  ┌────────────┐  ┌────────────┐  ┌────────────┐           │
-│  │ CORS Filter│→ │ JWT Filter │→ │ Controller │           │
-│  └────────────┘  └────────────┘  └────────────┘           │
-└─────────────────────────────────────────────────────────────┘
-                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    BUSINESS LOGIC                            │
-│  ┌─────────────┐  ┌──────────────┐  ┌─────────────┐       │
-│  │   Services  │←→│   Mappers    │←→│  Validators │       │
-│  └─────────────┘  └──────────────┘  └─────────────┘       │
-└─────────────────────────────────────────────────────────────┘
-                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    DATA ACCESS                               │
-│  ┌─────────────┐  ┌──────────────┐  ┌─────────────┐       │
-│  │Repositories │←→│   JPA/ORM    │←→│  Entities   │       │
-│  └─────────────┘  └──────────────┘  └─────────────┘       │
-└─────────────────────────────────────────────────────────────┘
-                             ▼
-┌─────────────────────────────────────────────────────────────┐
-│                      DATABASE                                │
-│              H2 (dev) / PostgreSQL (prod)                    │
-└─────────────────────────────────────────────────────────────┘
-```
+- `UserRepository`, `ReportRepository`, `LocationRepository`
+- Configuración de seguridad, CORS y OpenAPI
+- SQL versionado por motor (H2/PostgreSQL)
 
----
+Responsabilidad: acceso a datos y configuración técnica.
 
-## 🎯 Ventajas de esta Arquitectura
+## Seguridad
 
-### ✅ Mantenibilidad
-- Separación clara de responsabilidades
-- Fácil localización de código
-- Cambios aislados por capa
+- Autenticación stateless con JWT.
+- Login público en `POST /api/users/login`.
+- Registro público en `POST /api/users` (rol público: `CITIZEN`).
+- Endpoints protegidos por defecto.
+- Reglas por rol con `@PreAuthorize` en operaciones sensibles.
 
-### ✅ Testabilidad
-- Capas independientes
-- Fácil mockeado de dependencias
-- Tests unitarios e integración
+## Endpoints Implementados
 
-### ✅ Escalabilidad
-- Capas horizontales escalables
-- Microservicios potenciales
-- Cacheo por capa
+### Salud
 
-### ✅ Seguridad
-- Filtros centralizados
-- JWT stateless
-- Validaciones en múltiples capas
+- `GET /api/health`
 
-### ✅ Flexibilidad
-- Fácil cambio de providers (BD, auth, etc.)
-- Perfiles de entorno
-- Configuración externalizada
+### Usuarios
 
----
+- `POST /api/users`
+- `POST /api/users/login`
+- `GET /api/users/{id}`
+- `GET /api/users` (ADMIN)
+- `PUT /api/users/{id}`
+- `DELETE /api/users/{id}`
 
-## 📚 Referencias Arquitectónicas
+### Reportes
 
-- [Clean Architecture - Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
-- [Spring Boot Reference](https://docs.spring.io/spring-boot/docs/current/reference/html/)
-- [Domain-Driven Design](https://martinfowler.com/bliki/DomainDrivenDesign.html)
+- `POST /api/reports`
+- `GET /api/reports`
+- `GET /api/reports/{id}`
+- `GET /api/reports/user/{userId}`
+- `GET /api/reports/status/{status}`
+- `GET /api/reports/district/{district}`
+- `PATCH /api/reports/{id}/status` (ADMIN o MUNICIPAL_AGENT)
+- `DELETE /api/reports/{id}` (ADMIN)
+
+## Persistencia
+
+- Base de desarrollo: H2 en memoria (`dev`, `test`).
+- Base objetivo: PostgreSQL (`postgres`, `prod`).
+- Estrategia de esquema recomendada: scripts SQL + `ddl-auto=validate`.
+- Historial de estados y URLs de fotos modelados como `@ElementCollection`.
+
+## Decisiones Técnicas Clave
+
+- `spring.jpa.open-in-view=false` para evitar fugas de capa web a persistencia.
+- Excepciones de negocio tipadas (`BadRequestException`, `ForbiddenException`, etc.).
+- Validación de configuración JWT al iniciar la aplicación.
+- CORS explícito y restringido por propiedades.
+
+## Riesgos Técnicos a Vigilar
+
+- Completar cobertura de pruebas para módulo de reportes y seguridad.
+- Mantener sincronizados SQL (`db/*`) y entidades JPA.
+- Configurar secretos reales fuera del repositorio en producción.

@@ -110,7 +110,11 @@ public class ReportServiceImpl implements ReportService {
     @Override
     @Transactional(readOnly = true)
     public List<ReportDTO> getReportsByDistrict(String district) {
-        return reportRepository.findByDistrict(district).stream()
+        if (!StringUtils.hasText(district)) {
+            throw new IllegalArgumentException("El distrito es obligatorio");
+        }
+
+        return reportRepository.findByDistrict(district.trim()).stream()
                 .map(reportMapper::toDTO)
                 .toList();
     }

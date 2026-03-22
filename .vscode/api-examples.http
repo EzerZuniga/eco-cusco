@@ -4,7 +4,8 @@
 @contentType = application/json
 
 ### Variables
-@token = Bearer your-jwt-token-here
+@adminEmail = Zunigaezer@gmail.com
+@adminPassword = admin123
 @userId = 1
 @reportId = 1
 
@@ -25,47 +26,48 @@ POST {{baseUrl}}/api/users
 Content-Type: {{contentType}}
 
 {
-  "email": "juan.perez@example.com",
+  "email": "mendozaroger4@gmail.com",
   "password": "SecurePass123!",
-  "firstName": "Juan",
-  "lastName": "Pérez",
+  "firstName": "Roger",
+  "lastName": "Mendoza",
   "phone": "+51987654321",
   "role": "CITIZEN"
 }
 
-### Login
+### Login Admin (ejecuta este request primero para usar token automático)
+# @name login_admin
 POST {{baseUrl}}/api/users/login
 Content-Type: {{contentType}}
 
 {
-  "email": "juan.perez@example.com",
-  "password": "SecurePass123!"
+  "email": "{{adminEmail}}",
+  "password": "{{adminPassword}}"
 }
 
 ### Get All Users (requires auth)
 GET {{baseUrl}}/api/users
-Authorization: {{token}}
+Authorization: Bearer {{login_admin.response.body.$.token}}
 Accept: application/json
 
 ### Get User by ID (requires auth)
 GET {{baseUrl}}/api/users/{{userId}}
-Authorization: {{token}}
+Authorization: Bearer {{login_admin.response.body.$.token}}
 Accept: application/json
 
 ### Update User (requires auth)
 PUT {{baseUrl}}/api/users/{{userId}}
-Authorization: {{token}}
+Authorization: Bearer {{login_admin.response.body.$.token}}
 Content-Type: {{contentType}}
 
 {
-  "firstName": "Juan",
-  "lastName": "Pérez Actualizado",
+  "firstName": "Roger",
+  "lastName": "Mendoza Actualizado",
   "phone": "+51999888777"
 }
 
 ### Delete User (requires auth)
 DELETE {{baseUrl}}/api/users/{{userId}}
-Authorization: {{token}}
+Authorization: Bearer {{login_admin.response.body.$.token}}
 
 ###############################################
 # Reports
@@ -73,17 +75,17 @@ Authorization: {{token}}
 
 ### Get All Reports (requires auth)
 GET {{baseUrl}}/api/reports
-Authorization: {{token}}
+Authorization: Bearer {{login_admin.response.body.$.token}}
 Accept: application/json
 
 ### Get Report by ID (requires auth)
 GET {{baseUrl}}/api/reports/{{reportId}}
-Authorization: {{token}}
+Authorization: Bearer {{login_admin.response.body.$.token}}
 Accept: application/json
 
 ### Create Report (requires auth)
 POST {{baseUrl}}/api/reports
-Authorization: {{token}}
+Authorization: Bearer {{login_admin.response.body.$.token}}
 Content-Type: {{contentType}}
 
 {
@@ -92,35 +94,40 @@ Content-Type: {{contentType}}
   "category": "Residuos Sólidos",
   "latitude": -13.5226131,
   "longitude": -71.9673550,
-  "address": "Av. El Sol 123",
+  "address": "Av. El Sol ",
   "district": "Cusco",
   "photoUrls": [
     "https://example.com/photo1.jpg"
   ]
 }
 
-### Update Report Status (requires auth - ADMIN)
+### Update Report Status (requires auth - ADMIN o MUNICIPAL_AGENT)
 PATCH {{baseUrl}}/api/reports/{{reportId}}/status
-Authorization: {{token}}
+Authorization: Bearer {{login_admin.response.body.$.token}}
 Content-Type: {{contentType}}
 
 {
-  "status": "IN_PROGRESS",
+  "status": "EN_PROCESO",
   "notes": "Personal asignado para limpieza"
 }
 
 ### Delete Report (requires auth)
 DELETE {{baseUrl}}/api/reports/{{reportId}}
-Authorization: {{token}}
+Authorization: Bearer {{login_admin.response.body.$.token}}
 
 ### Filter Reports by Status (requires auth)
-GET {{baseUrl}}/api/reports/status/PENDING
-Authorization: {{token}}
+GET {{baseUrl}}/api/reports/status/PENDIENTE
+Authorization: Bearer {{login_admin.response.body.$.token}}
+Accept: application/json
+
+### Filter Reports by District (requires auth)
+GET {{baseUrl}}/api/reports/district/Cusco
+Authorization: Bearer {{login_admin.response.body.$.token}}
 Accept: application/json
 
 ### Get Reports by User (requires auth)
 GET {{baseUrl}}/api/reports/user/{{userId}}
-Authorization: {{token}}
+Authorization: Bearer {{login_admin.response.body.$.token}}
 Accept: application/json
 
 ###############################################
@@ -154,7 +161,7 @@ Accept: application/json
 
 ### Invalid Report Data (400)
 POST {{baseUrl}}/api/reports
-Authorization: {{token}}
+Authorization: Bearer {{login_admin.response.body.$.token}}
 Content-Type: {{contentType}}
 
 {
@@ -165,5 +172,5 @@ Content-Type: {{contentType}}
 
 ### Non-existent Resource (404)
 GET {{baseUrl}}/api/reports/99999
-Authorization: {{token}}
+Authorization: Bearer {{login_admin.response.body.$.token}}
 Accept: application/json

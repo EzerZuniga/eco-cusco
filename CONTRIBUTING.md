@@ -15,7 +15,7 @@ Gracias por considerar contribuir a Eco Cusco. Por favor, lee esta guía antes d
 
 ### Java
 - Sigue las convenciones de código de Java
-- Usa Lombok para reducir boilerplate
+- Prefiere constructor injection y DTOs/records para mantener el código claro
 - Documenta métodos públicos con JavaDoc
 - Mantén métodos cortos y con una sola responsabilidad
 

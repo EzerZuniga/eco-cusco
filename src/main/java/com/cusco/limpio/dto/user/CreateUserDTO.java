@@ -16,5 +16,5 @@ public record CreateUserDTO(
 
         @Pattern(regexp = "^\\+?[0-9]{9,15}$", message = "El teléfono debe ser válido (9-15 dígitos)") String phone,
 
-        @Pattern(regexp = "^(CITIZEN|MUNICIPAL_AGENT|ADMIN)$", message = "El rol debe ser CITIZEN, MUNICIPAL_AGENT o ADMIN") String role) {
+        @Pattern(regexp = "^CITIZEN$", message = "El rol público permitido es solo CITIZEN") String role) {
 }

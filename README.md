@@ -115,7 +115,6 @@ graph TB
 | **Spring Security** | Incluido en Spring Boot 3.4.3 | Autenticación y autorización |
 | **Spring Data JPA** | Incluido en Spring Boot 3.4.3 | Persistencia de datos |
 | **JWT (jjwt)** | 0.12.5 | Tokens de autenticación |
-| **Lombok** | Latest | Reducción de boilerplate |
 | **PostgreSQL** | Latest | Base de datos producción |
 | **H2** | Latest | Base de datos desarrollo |
 | **SpringDoc OpenAPI** | 2.1.0 | Documentación API |

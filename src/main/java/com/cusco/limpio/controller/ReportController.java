@@ -67,6 +67,11 @@ public class ReportController {
         return ResponseEntity.ok(reportService.getReportsByStatus(status));
     }
 
+    @GetMapping("/district/{district}")
+    public ResponseEntity<List<ReportDTO>> byDistrict(@PathVariable String district) {
+        return ResponseEntity.ok(reportService.getReportsByDistrict(district));
+    }
+
     /**
      * Actualiza el estado de un reporte.
      * Solo ADMIN o MUNICIPAL_AGENT pueden cambiar estados.
