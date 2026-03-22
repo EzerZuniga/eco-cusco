@@ -126,10 +126,16 @@ eco-cusco/
 │   │   └── 📁 resources/
 │   │       ├── application.properties
 │   │       ├── application-dev.properties
+│   │       ├── application-postgres.properties
 │   │       ├── application-prod.properties
 │   │       ├── banner.txt
-│   │       ├── data.sql
-│   │       └── schema.sql
+│   │       └── 📁 db/
+│   │           ├── 📁 h2/
+│   │           │   ├── schema.sql
+│   │           │   └── data.sql
+│   │           └── 📁 postgres/
+│   │               ├── schema.sql
+│   │               └── data.sql
 │   │
 │   └── 📁 test/
 │       ├── 📁 java/com/cusco/limpio/

@@ -33,21 +33,22 @@ SELECT version() AS "postgresql_version";
 --
 -- Después de crear la base de datos:
 --
--- OPCIÓN A - Dejar que Hibernate cree las tablas (RECOMENDADO):
---   1. No ejecutes más scripts SQL
---   2. En application-postgres.properties verifica:
+-- OPCIÓN A - Usar scripts SQL versionados (RECOMENDADO):
+--   1. Ejecuta: src/main/resources/db/postgres/schema.sql
+--   2. Ejecuta: src/main/resources/db/postgres/data.sql (opcional)
+--   3. En application-postgres.properties verifica:
+--      spring.jpa.hibernate.ddl-auto=validate
+--      spring.sql.init.mode=always
+--      spring.sql.init.schema-locations=classpath:db/postgres/schema.sql
+--      spring.sql.init.data-locations=classpath:db/postgres/data.sql
+--   4. Ejecuta: mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=postgres
+--
+-- OPCIÓN B - Dejar que Hibernate cree tablas (solo prototipado):
+--   1. No ejecutes scripts SQL de schema/data
+--   2. En application-postgres.properties configura:
 --      spring.jpa.hibernate.ddl-auto=update
 --      spring.sql.init.mode=never
 --   3. Ejecuta: mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=postgres
---   4. Hibernate creará todas las tablas automáticamente
---
--- OPCIÓN B - Crear tablas manualmente:
---   1. Ejecuta: src/main/resources/schema-postgres.sql
---   2. Ejecuta: src/main/resources/data-postgres.sql
---   3. En application-postgres.properties configura:
---      spring.jpa.hibernate.ddl-auto=validate
---      spring.sql.init.mode=never
---   4. Ejecuta: mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=postgres
 --
 -- ============================================
 

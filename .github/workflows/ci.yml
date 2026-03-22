@@ -24,15 +24,15 @@ jobs:
           cache: maven
 
       - name: Compile
-        run: ./mvnw clean compile -DskipTests -B
+        run: mvn clean compile -DskipTests -B
 
       - name: Run tests
         env:
           SPRING_PROFILES_ACTIVE: test
-        run: ./mvnw test -B
+        run: mvn test -B
 
       - name: Package application
-        run: ./mvnw package -DskipTests -B
+        run: mvn package -DskipTests -B
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -59,4 +59,4 @@ jobs:
           cache: maven
 
       - name: Verify compilation (sin tests)
-        run: ./mvnw clean verify -DskipTests -B
+        run: mvn clean verify -DskipTests -B

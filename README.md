@@ -3,7 +3,7 @@
 <div align="center">
 
 ![Java](https://img.shields.io/badge/Java-17+-orange?style=for-the-badge&logo=java)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.6-brightgreen?style=for-the-badge&logo=spring)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.3-brightgreen?style=for-the-badge&logo=spring)
 ![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
 
 **API RESTful para la gestión de reportes ciudadanos sobre limpieza pública y mantenimiento urbano en Cusco**
@@ -71,7 +71,20 @@ src/main/java/com/cusco/limpio/
 ├── security/              # JWT, filtros, UserDetails
 ├── service/               # Interfaces de servicio
 │   └── impl/              # Implementaciones de servicios
-└── util/                  # Utilidades (fechas, geo, responses)
+└── CuscoLimpioApiApplication.java
+
+src/main/resources/
+├── application.properties
+├── application-dev.properties
+├── application-postgres.properties
+├── application-prod.properties
+└── db/
+    ├── h2/
+    │   ├── schema.sql
+    │   └── data.sql
+    └── postgres/
+        ├── schema.sql
+        └── data.sql
 
 src/test/java/com/cusco/limpio/
 ├── controller/            # Tests de controladores
@@ -98,9 +111,9 @@ graph TB
 | Tecnología | Versión | Propósito |
 |-----------|---------|-----------|
 | **Java** | 17+ | Lenguaje de programación |
-| **Spring Boot** | 3.3.6 | Framework principal |
-| **Spring Security** | 3.3.6 | Autenticación y autorización |
-| **Spring Data JPA** | 3.3.6 | Persistencia de datos |
+| **Spring Boot** | 3.4.3 | Framework principal |
+| **Spring Security** | Incluido en Spring Boot 3.4.3 | Autenticación y autorización |
+| **Spring Data JPA** | Incluido en Spring Boot 3.4.3 | Persistencia de datos |
 | **JWT (jjwt)** | 0.12.5 | Tokens de autenticación |
 | **Lombok** | Latest | Reducción de boilerplate |
 | **PostgreSQL** | Latest | Base de datos producción |
@@ -115,7 +128,7 @@ graph TB
 ### Prerequisitos
 
 - **Java 17+** - [Descargar](https://adoptium.net/)
-- **Maven 3.6+** - [Descargar](https://maven.apache.org/download.cgi)
+- **Maven 3.6+** (opcional, recomendado para CI/local avanzado) - [Descargar](https://maven.apache.org/download.cgi)
 - **PostgreSQL** (solo para producción) - [Descargar](https://www.postgresql.org/download/)
 
 ### Pasos de Instalación
@@ -128,35 +141,32 @@ graph TB
 
 2. **Compilar el proyecto**
    ```bash
-   # Con Maven
-   mvn clean install
-   
-   # Con el script incluido (Windows)
-   build.bat
-   
+   # Recomendado en Windows (Maven Wrapper)
+   mvnw.cmd clean install
+
    # Para compilar sin ejecutar tests
-   build.bat skip-tests
+   mvnw.cmd clean install -DskipTests
+
+   # Alternativa si tienes Maven instalado globalmente
+   mvn clean install
    ```
 
 3. **Ejecutar en modo desarrollo**
    ```bash
-   # Con Maven
-   mvn spring-boot:run -Dspring-boot.run.profiles=dev
-   
-   # Con el script incluido (Windows)
-   run.bat
-   
-   # Para usar otro perfil
-   run.bat prod
+   # Perfil dev (H2 en memoria)
+   mvnw.cmd spring-boot:run -Dspring-boot.run.profiles=dev
+
+   # Perfil postgres con script de ayuda
+   .\run-postgres.ps1 start -SpringProfile postgres
    ```
 
 4. **Ejecutar tests**
    ```bash
-   # Con Maven
+   # Con Maven Wrapper (Windows)
+   mvnw.cmd test
+
+   # Alternativa si tienes Maven instalado globalmente
    mvn test
-   
-   # Con el script incluido (Windows)
-   test.bat
    ```
 
 5. **Acceder a la aplicación**

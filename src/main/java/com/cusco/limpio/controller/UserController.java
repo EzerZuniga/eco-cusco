@@ -23,14 +23,15 @@ import com.cusco.limpio.dto.user.UpdateUserDTO;
 import com.cusco.limpio.dto.user.UserDTO;
 import com.cusco.limpio.service.UserService;
 
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequestMapping("/api/users")
-@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     /**
      * Registro de nuevo usuario.

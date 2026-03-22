@@ -1,10 +1,11 @@
 package com.cusco.limpio.config;
 
-import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.core.env.Profiles;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,6 +28,11 @@ import com.cusco.limpio.security.JwtTokenProvider;
 @Configuration
 @EnableMethodSecurity(securedEnabled = true, jsr250Enabled = true)
 public class SecurityConfig {
+
+    private static final List<String> PUBLIC_DOCUMENTATION_ENDPOINTS = List.of(
+            "/swagger-ui/**",
+            "/v3/api-docs/**",
+            "/swagger-ui.html");
 
     private final Environment environment;
 
@@ -57,7 +63,7 @@ public class SecurityConfig {
                     });
                     headers.xssProtection(xss -> {
                     });
-                    if (isDevelopmentProfile()) {
+                    if (isLocalProfile()) {
                         headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable);
                     } else {
                         headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::deny);
@@ -69,7 +75,7 @@ public class SecurityConfig {
 
                     // Rutas completamente públicas
                     auth.requestMatchers("/api/health/**").permitAll();
-                    auth.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll();
+                    auth.requestMatchers(PUBLIC_DOCUMENTATION_ENDPOINTS.toArray(String[]::new)).permitAll();
 
                     // Registro: solo POST /api/users es público
                     auth.requestMatchers(HttpMethod.POST, "/api/users").permitAll();
@@ -77,8 +83,8 @@ public class SecurityConfig {
                     // Login: POST /api/users/login es público
                     auth.requestMatchers(HttpMethod.POST, "/api/users/login").permitAll();
 
-                    // Consola H2 solo en perfil de desarrollo
-                    if (isDevelopmentProfile()) {
+                    // Consola H2 solo en entornos locales.
+                    if (isLocalProfile()) {
                         auth.requestMatchers("/h2-console/**").permitAll();
                     }
 
@@ -90,7 +96,7 @@ public class SecurityConfig {
         return http.build();
     }
 
-    private boolean isDevelopmentProfile() {
-        return Arrays.asList(environment.getActiveProfiles()).contains("dev");
+    private boolean isLocalProfile() {
+        return environment.acceptsProfiles(Profiles.of("dev", "test"));
     }
 }

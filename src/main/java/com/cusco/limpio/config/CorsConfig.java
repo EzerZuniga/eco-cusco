@@ -17,9 +17,21 @@ public class CorsConfig {
 
     @Bean
     public CorsFilter corsFilter() {
+        List<String> sanitizedOrigins = allowedOrigins.stream()
+                .map(String::trim)
+                .filter(origin -> !origin.isEmpty())
+                .toList();
+
+        if (sanitizedOrigins.isEmpty()) {
+            throw new IllegalStateException("app.cors.allowed-origins debe tener al menos un origen válido");
+        }
+        if (sanitizedOrigins.contains("*")) {
+            throw new IllegalStateException("No se permite '*' en app.cors.allowed-origins cuando hay credenciales");
+        }
+
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(allowedOrigins);
+        config.setAllowedOrigins(sanitizedOrigins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin"));
         config.setExposedHeaders(List.of("Authorization"));

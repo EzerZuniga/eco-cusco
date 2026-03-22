@@ -2,10 +2,12 @@ package com.cusco.limpio.service.impl;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.cusco.limpio.domain.model.User;
@@ -23,12 +25,10 @@ import com.cusco.limpio.repository.UserRepository;
 import com.cusco.limpio.security.JwtTokenProvider;
 import com.cusco.limpio.service.UserService;
 
-import lombok.RequiredArgsConstructor;
-
-@SuppressWarnings("null")
 @Service
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
+    private static final User.UserRole PUBLIC_REGISTRATION_ROLE = User.UserRole.CITIZEN;
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -38,29 +38,37 @@ public class UserServiceImpl implements UserService {
     @Value("${app.jwt.expiration-ms:3600000}")
     private long jwtExpirationMs;
 
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder,
+            JwtTokenProvider jwtTokenProvider) {
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
+
     @Override
     @Transactional
     public UserDTO createUser(CreateUserDTO createUserDTO) {
-        if (userRepository.existsByEmail(createUserDTO.email())) {
+        String normalizedEmail = normalizeEmail(createUserDTO.email());
+        if (!StringUtils.hasText(normalizedEmail)) {
+            throw new BadRequestException("El email es obligatorio");
+        }
+        if (userRepository.existsByEmailIgnoreCase(normalizedEmail)) {
             throw new BadRequestException("El email ya está registrado");
         }
 
-        User.UserRole role;
-        try {
-            role = User.UserRole.valueOf(createUserDTO.role().toUpperCase());
-        } catch (IllegalArgumentException e) {
-            throw new BadRequestException("Rol inválido: " + createUserDTO.role());
-        }
+        User.UserRole role = resolveRegistrationRole(createUserDTO.role());
+        LocalDateTime now = LocalDateTime.now();
 
         User user = User.builder()
-                .email(createUserDTO.email())
+                .email(normalizedEmail)
                 .password(passwordEncoder.encode(createUserDTO.password()))
                 .firstName(createUserDTO.firstName())
                 .lastName(createUserDTO.lastName())
                 .phone(createUserDTO.phone())
                 .role(role)
                 .active(true)
-                .createdAt(LocalDateTime.now())
+                .createdAt(now)
                 .build();
 
         return userMapper.toDTO(userRepository.save(user));
@@ -85,24 +93,7 @@ public class UserServiceImpl implements UserService {
     public UserDTO updateUser(Long id, UpdateUserDTO dto, String authenticatedEmail) {
         User user = findUserOrThrow(id);
         assertOwnerOrAdmin(user, authenticatedEmail);
-
-        // Actualización parcial: solo se modifican los campos que el cliente envía (no
-        // nulos)
-        if (dto.firstName() != null) {
-            user.setFirstName(dto.firstName());
-        }
-        if (dto.lastName() != null) {
-            user.setLastName(dto.lastName());
-        }
-        if (dto.phone() != null) {
-            user.setPhone(dto.phone());
-        }
-
-        // Cambio de contraseña es opcional: solo si se envía newPassword
-        if (dto.newPassword() != null && !dto.newPassword().isBlank()) {
-            user.setPassword(passwordEncoder.encode(dto.newPassword()));
-        }
-
+        applyPartialUpdate(user, dto);
         user.setUpdatedAt(LocalDateTime.now());
         return userMapper.toDTO(userRepository.save(user));
     }
@@ -121,7 +112,12 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional(readOnly = true)
     public AuthResponseDTO authenticate(LoginDTO loginDTO) {
-        User user = userRepository.findByEmail(loginDTO.email())
+        String normalizedEmail = normalizeEmail(loginDTO.email());
+        if (!StringUtils.hasText(normalizedEmail)) {
+            throw new UnauthorizedException("Credenciales inválidas");
+        }
+
+        User user = userRepository.findByEmailIgnoreCase(normalizedEmail)
                 .orElseThrow(() -> new UnauthorizedException("Credenciales inválidas"));
 
         if (!passwordEncoder.matches(loginDTO.password(), user.getPassword())) {
@@ -143,17 +139,67 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + id));
     }
 
-    // Verifica que el usuario autenticado sea el propietario del recurso o un ADMIN
-    private void assertOwnerOrAdmin(User targetUser, String authenticatedEmail) {
-        boolean isOwner = targetUser.getEmail().equalsIgnoreCase(authenticatedEmail);
-
-        if (!isOwner) {
-            User authenticatedUser = userRepository.findByEmail(authenticatedEmail)
-                    .orElseThrow(() -> new UnauthorizedException("Usuario autenticado no encontrado"));
-            boolean isAdmin = authenticatedUser.getRole() == User.UserRole.ADMIN;
-            if (!isAdmin) {
-                throw new ForbiddenException("No tienes autorización para modificar este usuario");
-            }
+    private void applyPartialUpdate(User user, UpdateUserDTO dto) {
+        if (StringUtils.hasText(dto.firstName())) {
+            user.setFirstName(dto.firstName().trim());
         }
+        if (StringUtils.hasText(dto.lastName())) {
+            user.setLastName(dto.lastName().trim());
+        }
+        if (StringUtils.hasText(dto.phone())) {
+            user.setPhone(dto.phone().trim());
+        }
+
+        // La contraseña se actualiza solo cuando el cliente la envía explícitamente.
+        if (StringUtils.hasText(dto.newPassword())) {
+            user.setPassword(passwordEncoder.encode(dto.newPassword()));
+        }
+    }
+
+    // Verifica que el usuario autenticado sea el propietario del recurso o un ADMIN.
+    private void assertOwnerOrAdmin(User targetUser, String authenticatedEmail) {
+        String normalizedAuthenticatedEmail = normalizeEmail(authenticatedEmail);
+        if (!StringUtils.hasText(normalizedAuthenticatedEmail)) {
+            throw new UnauthorizedException("Usuario autenticado no encontrado");
+        }
+
+        boolean isOwner = targetUser.getEmail().equalsIgnoreCase(normalizedAuthenticatedEmail);
+
+        if (isOwner) {
+            return;
+        }
+
+        User authenticatedUser = userRepository.findByEmailIgnoreCase(normalizedAuthenticatedEmail)
+                .orElseThrow(() -> new UnauthorizedException("Usuario autenticado no encontrado"));
+        boolean isAdmin = authenticatedUser.getRole() == User.UserRole.ADMIN;
+        if (!isAdmin) {
+            throw new ForbiddenException("No tienes autorización para modificar este usuario");
+        }
+    }
+
+    private User.UserRole resolveRegistrationRole(String requestedRole) {
+        if (!StringUtils.hasText(requestedRole)) {
+            return PUBLIC_REGISTRATION_ROLE;
+        }
+
+        User.UserRole parsedRole;
+        try {
+            parsedRole = User.UserRole.valueOf(requestedRole.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException ex) {
+            throw new BadRequestException("Rol inválido: " + requestedRole);
+        }
+
+        if (parsedRole != PUBLIC_REGISTRATION_ROLE) {
+            throw new BadRequestException("El registro público solo permite el rol CITIZEN");
+        }
+        return parsedRole;
+    }
+
+    private String normalizeEmail(String email) {
+        if (!StringUtils.hasText(email)) {
+            return null;
+        }
+
+        return email.trim().toLowerCase(Locale.ROOT);
     }
 }

@@ -28,7 +28,6 @@ import com.cusco.limpio.mapper.UserMapper;
 import com.cusco.limpio.repository.UserRepository;
 import com.cusco.limpio.security.JwtTokenProvider;
 
-@SuppressWarnings("null")
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
 
@@ -87,7 +86,7 @@ class UserServiceImplTest {
     @Test
     void createUser_ShouldReturnUserDTO_WhenEmailDoesNotExist() {
         // Given
-        when(userRepository.existsByEmail(anyString())).thenReturn(false);
+        when(userRepository.existsByEmailIgnoreCase(anyString())).thenReturn(false);
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(userMapper.toDTO(any(User.class))).thenReturn(userDTO);
@@ -98,21 +97,68 @@ class UserServiceImplTest {
         // Then
         assertThat(result).isNotNull();
         assertThat(result.email()).isEqualTo("test@example.com");
-        verify(userRepository, times(1)).existsByEmail(createUserDTO.email());
+        verify(userRepository, times(1)).existsByEmailIgnoreCase(createUserDTO.email());
         verify(userRepository, times(1)).save(any(User.class));
     }
 
     @Test
     void createUser_ShouldThrowBadRequestException_WhenEmailAlreadyExists() {
         // Given
-        when(userRepository.existsByEmail(anyString())).thenReturn(true);
+        when(userRepository.existsByEmailIgnoreCase(anyString())).thenReturn(true);
 
         // When & Then
         assertThatThrownBy(() -> userService.createUser(createUserDTO))
                 .isInstanceOf(BadRequestException.class)
                 .hasMessage("El email ya está registrado");
 
-        verify(userRepository, times(1)).existsByEmail(createUserDTO.email());
+        verify(userRepository, times(1)).existsByEmailIgnoreCase(createUserDTO.email());
+        verify(userRepository, never()).save(any(User.class));
+    }
+
+    @Test
+    void createUser_ShouldNormalizeEmailAndDefaultRole_WhenInputHasMixedCase() {
+        // Given
+        CreateUserDTO mixedCaseDto = new CreateUserDTO(
+                " Test@Example.COM ",
+                "password123",
+                "John",
+                "Doe",
+                "+51999999999",
+                null);
+
+        when(userRepository.existsByEmailIgnoreCase("test@example.com")).thenReturn(false);
+        when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
+        when(userRepository.save(any(User.class))).thenReturn(user);
+        when(userMapper.toDTO(any(User.class))).thenReturn(userDTO);
+
+        // When
+        UserDTO result = userService.createUser(mixedCaseDto);
+
+        // Then
+        assertThat(result).isNotNull();
+        verify(userRepository).existsByEmailIgnoreCase("test@example.com");
+        verify(userRepository).save(any(User.class));
+    }
+
+    @Test
+    void createUser_ShouldThrowBadRequestException_WhenPublicRegistrationRequestsAdminRole() {
+        // Given
+        CreateUserDTO adminRoleDto = new CreateUserDTO(
+                "admin@example.com",
+                "password123",
+                "Admin",
+                "User",
+                "+51999999999",
+                "ADMIN");
+
+        when(userRepository.existsByEmailIgnoreCase("admin@example.com")).thenReturn(false);
+
+        // When & Then
+        assertThatThrownBy(() -> userService.createUser(adminRoleDto))
+                .isInstanceOf(BadRequestException.class)
+                .hasMessage("El registro público solo permite el rol CITIZEN");
+
+        verify(userRepository).existsByEmailIgnoreCase("admin@example.com");
         verify(userRepository, never()).save(any(User.class));
     }
 

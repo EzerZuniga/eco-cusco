@@ -1,16 +1,9 @@
-# Compiled class file
+# Build outputs
+target/
+build/
+out/
+bin/
 *.class
-
-# Log file
-*.log
-
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
 *.jar
 *.war
 *.nar
@@ -19,12 +12,7 @@
 *.tar.gz
 *.rar
 
-# virtual machine crash logs
-hs_err_pid*
-replay_pid*
-
 # Maven
-target/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -33,95 +21,60 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
-.mvn/wrapper/maven-wrapper.jar
+.m2/
+.m2repo/
+.home/
 
 # Gradle
-.gradle
-build/
+.gradle/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
 
-# IntelliJ IDEA
-.idea/
-*.iws
-*.iml
-*.ipr
-out/
-
-# Eclipse
-.classpath
-.project
-.settings/
-bin/
-
-# VS Code (permitir configuraciones compartidas del proyecto)
-.vscode/*.local.*
-.vscode/settings.local.json
-
-# NetBeans
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-
-# macOS
-.DS_Store
-.AppleDouble
-.LSOverride
-
-# Windows
-Thumbs.db
-Thumbs.db:encryptable
-ehthumbs.db
-ehthumbs_vista.db
-Desktop.ini
-$RECYCLE.BIN/
-
-# Environment files (NEVER commit secrets)
+# Environment and secrets
 .env
 .env.*
 !.env.example
-
-# Application specific
+*.env
 application-local.properties
 application-secret.properties
-*.env
-.env
 
-# Spring Boot
-spring-boot-*.log
-
-# Logs generales
-logs/
+# Logs
+*.log
 *.log.*
+spring-boot-*.log
+logs/
 
-# Base de datos local
+# Test and coverage output
+test-output/
+coverage/
+.nyc_output/
+
+# Local databases and dumps
 *.db
 *.sqlite
 *.h2.db
 h2-data/
+*.sql.backup
+*.dump
 
-# Archivo de backups
+# Temporary and backup files
 *.bak
 *.backup
 *.swp
 *.swo
 *~
+*.orig
+hs_err_pid*
+replay_pid*
 
-# Archivos temporales de testing
-test-output/
-coverage/
-.nyc_output/
-
-# Node (si usas frontend integrado)
+# Node
 node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
-# Python (si integras scripts)
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
@@ -129,17 +82,40 @@ venv/
 env/
 .Python
 
-# PostgreSQL dumps
-*.sql.backup
-*.dump
+# IDEs and editors
+.idea/
+.idea/workspace.xml
+.idea/tasks.xml
+*.iws
+*.iml
+*.ipr
+.classpath
+.project
+.settings/
+.vscode/*.local.*
+.vscode/settings.local.json
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
 
-# Scripts locales de ejecución (personalizados por desarrollador)
+# OS files
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Legacy tools
+*.ctxt
+.mtj.tmp/
+
+# Local helper scripts (developer-specific)
 run-*.local.ps1
 run-*.local.sh
 init-database.local.sql
-
-# IDE específico del usuario
-.vscode/*.local.*
-.vscode/settings.local.json
-.idea/workspace.xml
-.idea/tasks.xml

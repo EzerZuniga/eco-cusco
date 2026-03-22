@@ -22,7 +22,6 @@ import com.cusco.limpio.dto.user.UserDTO;
 import com.cusco.limpio.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@SuppressWarnings("null")
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")

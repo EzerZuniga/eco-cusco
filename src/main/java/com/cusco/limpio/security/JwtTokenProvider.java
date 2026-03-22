@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import jakarta.annotation.PostConstruct;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -18,12 +19,30 @@ import io.jsonwebtoken.security.Keys;
 public class JwtTokenProvider {
 
     private static final Logger log = LoggerFactory.getLogger(JwtTokenProvider.class);
+    private static final int MIN_HS256_SECRET_BYTES = 32;
 
     @Value("${app.jwt.secret:changeit}")
     private String jwtSecret;
 
     @Value("${app.jwt.expiration-ms:3600000}")
     private long jwtExpirationMs;
+
+    @PostConstruct
+    void validateConfiguration() {
+        if (jwtSecret == null || jwtSecret.isBlank()) {
+            throw new IllegalStateException("app.jwt.secret no puede estar vacío");
+        }
+
+        int secretBytes = jwtSecret.getBytes(StandardCharsets.UTF_8).length;
+        if (secretBytes < MIN_HS256_SECRET_BYTES) {
+            throw new IllegalStateException(
+                    "app.jwt.secret debe tener al menos 32 bytes para HS256 (actual: " + secretBytes + ")");
+        }
+
+        if (jwtExpirationMs <= 0) {
+            throw new IllegalStateException("app.jwt.expiration-ms debe ser mayor a 0");
+        }
+    }
 
     private SecretKey getSigningKey() {
         byte[] keyBytes = jwtSecret.getBytes(StandardCharsets.UTF_8);

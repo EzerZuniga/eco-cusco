@@ -9,7 +9,7 @@ Gracias por considerar contribuir a Eco Cusco. Por favor, lee esta guía antes d
 1. Fork el repositorio
 2. Clona tu fork: `git clone https://github.com/tu-usuario/eco-cusco.git`
 3. Agrega el repositorio original como upstream: `git remote add upstream https://github.com/EzerZuniga/eco-cusco.git`
-4. Instala las dependencias: `mvn clean install`
+4. Instala las dependencias: `mvnw.cmd clean install` (Windows) o `mvn clean install`
 
 ## Estándares de Código
 
@@ -35,7 +35,7 @@ Gracias por considerar contribuir a Eco Cusco. Por favor, lee esta guía antes d
 
 1. **Crea una rama**: `git checkout -b feature/nueva-funcionalidad`
 2. **Haz tus cambios**: Sigue los estándares de código
-3. **Ejecuta los tests**: `mvn test`
+3. **Ejecuta los tests**: `mvnw.cmd test` (Windows) o `mvn test`
 4. **Commit**: `git commit -m "feat: descripción de la funcionalidad"`
 5. **Push**: `git push origin feature/nueva-funcionalidad`
 6. **Pull Request**: Crea un PR hacia la rama `main`

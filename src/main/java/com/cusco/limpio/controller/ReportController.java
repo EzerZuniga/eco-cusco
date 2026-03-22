@@ -21,14 +21,15 @@ import com.cusco.limpio.dto.report.ReportDTO;
 import com.cusco.limpio.dto.report.UpdateStatusDTO;
 import com.cusco.limpio.service.ReportService;
 
-import lombok.RequiredArgsConstructor;
-
 @RestController
 @RequestMapping("/api/reports")
-@RequiredArgsConstructor
 public class ReportController {
 
     private final ReportService reportService;
+
+    public ReportController(ReportService reportService) {
+        this.reportService = reportService;
+    }
 
     /**
      * Crea un nuevo reporte.

@@ -1,9 +1,13 @@
 package com.cusco.limpio.mapper;
 
+import java.util.List;
+
+import org.springframework.stereotype.Component;
+
+import com.cusco.limpio.domain.model.Location;
 import com.cusco.limpio.domain.model.Report;
 import com.cusco.limpio.dto.report.ReportDTO;
 import com.cusco.limpio.dto.user.UserDTO;
-import org.springframework.stereotype.Component;
 
 @Component
 public class ReportMapper {
@@ -15,19 +19,9 @@ public class ReportMapper {
     }
 
     public ReportDTO toDTO(Report report) {
-        if (report == null) return null;
-
-        ReportDTO.LocationDTO location = new ReportDTO.LocationDTO(
-                report.getLocation() == null ? null : report.getLocation().getLatitude(),
-                report.getLocation() == null ? null : report.getLocation().getLongitude(),
-                report.getLocation() == null ? null : report.getLocation().getAddress(),
-                report.getLocation() == null ? null : report.getLocation().getDistrict()
-        );
-
-        var statusHistory = report.getStatusHistory() == null ? java.util.List.<ReportDTO.StatusHistoryDTO>of() :
-                report.getStatusHistory().stream()
-                        .map(h -> new ReportDTO.StatusHistoryDTO(h.getStatus(), h.getTimestamp(), h.getNotes()))
-                        .toList();
+        if (report == null) {
+            return null;
+        }
 
         UserDTO userDTO = report.getUser() == null ? null : userMapper.toDTO(report.getUser());
 
@@ -39,10 +33,34 @@ public class ReportMapper {
                 report.getCategory(),
                 report.getPhotoUrls(),
                 userDTO,
-                location,
+                toLocationDTO(report.getLocation()),
                 report.getCreatedAt(),
                 report.getUpdatedAt(),
-                statusHistory
-        );
+                toStatusHistoryDTOs(report));
+    }
+
+    private ReportDTO.LocationDTO toLocationDTO(Location location) {
+        if (location == null) {
+            return null;
+        }
+
+        return new ReportDTO.LocationDTO(
+                location.getLatitude(),
+                location.getLongitude(),
+                location.getAddress(),
+                location.getDistrict());
+    }
+
+    private List<ReportDTO.StatusHistoryDTO> toStatusHistoryDTOs(Report report) {
+        if (report.getStatusHistory() == null) {
+            return List.of();
+        }
+
+        return report.getStatusHistory().stream()
+                .map(history -> new ReportDTO.StatusHistoryDTO(
+                        history.getStatus(),
+                        history.getTimestamp(),
+                        history.getNotes()))
+                .toList();
     }
 }
